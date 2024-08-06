@@ -74,18 +74,11 @@ int main(void)
     // UI Modes
 
     // define signals
-    // Signal<Position> mouseClickSignal;
-    // Signal<Unit> unitClickSignal;
-    // Signal<Unit> unitHoverSignal;
-    // Signal<Tile> tileClickSignal;
-    // Signal<Tile> tileHoverSignal;
-    // Signal<Ability> selectAbilitySignal;
-    // Signal<Ability, Unit> useAbilityOnUnit;
+    Signal<PrepareTrapezoidRotationPayload> prepareTrapezoidRotationSignal;
 
     // connect signal slots
-    // Connect slot to handle UIButton click
-    // buttonClickedSignal.connect([&](const ButtonName &buttonName)
-    //                             { handleUIButtonClick(buttonName, isPlacingUnit, unitToPlace, selectedButtonName, isPrepareMoveMode, isSelectingTarget); });
+    prepareTrapezoidRotationSignal.connect([&](const PrepareTrapezoidRotationPayload &payload)
+                                           { setVisionTrapezoidRotation(payload); });
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
     SetWindowPosition(0, 0);
@@ -138,9 +131,9 @@ int main(void)
         sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos);
         sAutoDeselectAbility(selectedUnit, selectedAbility);
         sSelectAbility(selectedUnit, selectedAbility, worldMousePos);
-        sUseAbility(selectedUnit, selectedAbility, hoveredTile, player, allUnits, allObstacles);
+        sUseAbility(selectedUnit, selectedAbility, hoveredTile, player, allUnits, allObstacles, prepareTrapezoidRotationSignal);
         sClearStates(selectedUnit, selectedAbility);
-        sPositionVisionTrapezoids(allUnits);
+        // sPositionVisionTrapezoids(allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
         sDestroyObstacles(allObstacles);

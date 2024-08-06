@@ -12,7 +12,7 @@ void createUnit(
     newUnit.unitType = unitType;
     newUnit.uuid = generateUUID();
     newUnit.pos = pos;
-    newUnit.facingDirection = CardinalDirection::E;
+    newUnit.facingDirection = CardinalDirection::N;
     newUnit.visionTrapezoid = {};
     newUnit.health = 100.0f;
     newUnit.xp = 0.0f;
@@ -155,5 +155,96 @@ void sPositionVisionTrapezoids(std::vector<Unit> &allUnits)
         rotateTrapezoid(trapezoid, rotateDegrees);
         repositionTrapezoid(trapezoid, originPos);
         unit.visionTrapezoid = trapezoid;
+    }
+}
+
+void setVisionTrapezoidRotation(const PrepareTrapezoidRotationPayload &payload)
+{
+    // assuming a north facing visionTrapezoid, these are the degrees to which it needs to be rotated to face a given CardinalDirection
+    std::unordered_map<CardinalDirection, float> directionToAngleMap;
+    directionToAngleMap[CardinalDirection::N] = 0.0;
+    directionToAngleMap[CardinalDirection::NE] = 45.0;
+    directionToAngleMap[CardinalDirection::E] = 90.0;
+    directionToAngleMap[CardinalDirection::SE] = 135.0;
+    directionToAngleMap[CardinalDirection::S] = 180.0;
+    directionToAngleMap[CardinalDirection::SW] = -135.0;
+    directionToAngleMap[CardinalDirection::W] = -90.0;
+
+    Position point = payload.point;
+    Unit *unit = payload.selectedUnit;
+
+    // In the beginning, assume orientation is N
+    IsoscelesTrapezoid trapezoid;
+    trapezoid.originPos = {unit->pos.x + (unit->tex.width / 2), unit->pos.y};
+    trapezoid.p1 = {(trapezoid.originPos.x + (unit->tex.width / 2)) + ((unit->viewWidth / 2) * 32.0f), unit->pos.y};
+    trapezoid.p4 = {(trapezoid.originPos.x - (unit->tex.width / 2)) - ((unit->viewWidth / 2) * 32.0f), unit->pos.y};
+    trapezoid.p2 = {trapezoid.p1.x + (unit->viewDistance * 32.0f), trapezoid.p1.y - (unit->viewDistance * 32.0f)};
+    trapezoid.p3 = {trapezoid.p4.x - (unit->viewDistance * 32.0f), trapezoid.p2.y};
+
+    float rotateDegrees;
+    Position originPos;
+
+    for (const auto &[key, value] : directionToAngleMap)
+    {
+        rotateDegrees = value;
+        switch (key)
+        {
+        case CardinalDirection::N:
+        {
+            std::cout << "N" << std::endl;
+            originPos = {unit->pos.x + (unit->tex.width / 2), unit->pos.y};
+            break;
+        }
+        case CardinalDirection::S:
+        {
+            std::cout << "S" << std::endl;
+            originPos = {unit->pos.x + (unit->tex.width / 2), unit->pos.y + unit->tex.height};
+            break;
+        }
+        case CardinalDirection::E:
+        {
+            std::cout << "E" << std::endl;
+            originPos = {unit->pos.x + unit->tex.width, unit->pos.y + (unit->tex.height / 2)};
+            break;
+        }
+        case CardinalDirection::W:
+        {
+            std::cout << "W" << std::endl;
+            originPos = {unit->pos.x, unit->pos.y + (unit->tex.height / 2)};
+            break;
+        }
+        case CardinalDirection::NE:
+        {
+            std::cout << "NE" << std::endl;
+            originPos = {unit->pos.x + unit->tex.width, unit->pos.y};
+            break;
+        }
+        case CardinalDirection::NW:
+        {
+            std::cout << "NW" << std::endl;
+            originPos = {unit->pos.x, unit->pos.y};
+            break;
+        }
+        case CardinalDirection::SE:
+        {
+            std::cout << "SE" << std::endl;
+            originPos = {unit->pos.x + unit->tex.height, unit->pos.y + unit->tex.height};
+            break;
+        }
+        case CardinalDirection::SW:
+        {
+            std::cout << "SW" << std::endl;
+            originPos = {unit->pos.x, unit->pos.y + unit->tex.height};
+            break;
+        }
+        }
+        rotateTrapezoid(trapezoid, rotateDegrees);
+        repositionTrapezoid(trapezoid, originPos);
+        if (isPointBetweenLongSides({point.x, point.y}, trapezoid))
+        {
+            std::cout << value << std::endl;
+            unit->facingDirection = key;
+            break;
+        }
     }
 }

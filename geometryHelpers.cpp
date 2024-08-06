@@ -35,7 +35,7 @@ Position rotatePoint(const Position &point, const Position &center, float angleD
 }
 
 // Function to rotate the trapezoid
-void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, double angleDegrees)
+void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angleDegrees)
 {
     // Rotate each vertex around the origin position
     trapezoid.p1 = rotatePoint(trapezoid.p1, trapezoid.originPos, angleDegrees);
@@ -63,4 +63,31 @@ void repositionTrapezoid(IsoscelesTrapezoid &trapezoid, const Position &newOrigi
     trapezoid.p3.y += dy;
     trapezoid.p4.x += dx;
     trapezoid.p4.y += dy;
+}
+
+Vector2 getNormal(Vector2 v)
+{
+    return (Vector2){-v.y, v.x};
+}
+
+bool isPointBetweenLongSides(Vector2 point, const IsoscelesTrapezoid &trapezoid)
+{
+    Vector2 A = {trapezoid.p1.x, trapezoid.p1.y};
+    Vector2 B = {trapezoid.p2.x, trapezoid.p2.y};
+    Vector2 C = {trapezoid.p3.x, trapezoid.p3.y};
+    Vector2 D = {trapezoid.p4.x, trapezoid.p4.y};
+
+    Vector2 AB = {B.x - A.x, B.y - A.y};
+    Vector2 CD = {D.x - C.x, D.y - C.y};
+
+    Vector2 normalAB = getNormal(AB);
+    Vector2 normalCD = getNormal(CD);
+
+    Vector2 AP = {point.x - A.x, point.y - A.y};
+    Vector2 CP = {point.x - C.x, point.y - C.y};
+
+    float dotAB = normalAB.x * AP.x + normalAB.y * AP.y;
+    float dotCD = normalCD.x * CP.x + normalCD.y * CP.y;
+
+    return (dotAB > 0 && dotCD < 0) || (dotAB < 0 && dotCD > 0);
 }

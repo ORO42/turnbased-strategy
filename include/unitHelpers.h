@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <unordered_map>
 #include "components.h"
 #include "uuid.h"
 #include "geometryHelpers.h"
@@ -12,3 +13,4 @@ void createUnit(
     std::vector<Unit> &allUnits,
     Texture2D &unitTex);
 void sPositionVisionTrapezoids(std::vector<Unit> &allUnits);
+void setVisionTrapezoidRotation(const PrepareTrapezoidRotationPayload &payload);

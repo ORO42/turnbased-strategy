@@ -198,3 +198,9 @@ struct Projectile
     // float maxDistanceFromOrigin;
     float speed;
 };
+
+struct PrepareTrapezoidRotationPayload
+{
+    Position point;
+    Unit *&selectedUnit;
+};
