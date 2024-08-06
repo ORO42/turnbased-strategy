@@ -141,16 +141,7 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
                 Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
                 Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
                 float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, hoveredTileCenter);
-                // TODO iterate through all trapezoid positions, check if clicked point falls within the angle of the two sides of the trapezoid, if it does, break, and set trapezoid to that position where overlap is projected
-                // N
-                if (angleToRotationTarget < 0 && angleToRotationTarget > -90)
-                {
-                    selectedUnit->facingDirection = CardinalDirection::NE;
-                }
-                else if (angleToRotationTarget > -90 && angleToRotationTarget < -135)
-                {
-                }
-                std::cout << angleToRotationTarget << std::endl;
+                selectedUnit->facingAngle = angleToRotationTarget;
                 useAbility = true;
             }
         }

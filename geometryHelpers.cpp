@@ -17,31 +17,33 @@ Position getRectCenter(Rectangle rect)
     return center;
 }
 
-// Function to rotate a point around a center by a certain angle
-Position rotatePoint(const Position &point, const Position &center, float angleDegrees)
+Position rotatePoint(Position origin, Position point, float angle)
 {
-    // Convert angle from degrees to radians
-    float angleRadians = angleDegrees * (M_PI / 180.0);
+    float rad = angle * (M_PI / 180.0f); // Convert to radians
+    float s = std::sin(rad);
+    float c = std::cos(rad);
 
-    // Calculate the difference between the point and the center
-    float dx = point.x - center.x;
-    float dy = point.y - center.y;
+    // Translate point back to origin
+    point.x -= origin.x;
+    point.y -= origin.y;
 
-    // Calculate the new coordinates after rotation
-    float xNew = center.x + dx * cos(angleRadians) - dy * sin(angleRadians);
-    float yNew = center.y + dx * sin(angleRadians) + dy * cos(angleRadians);
+    // Rotate point
+    float xnew = point.x * c - point.y * s;
+    float ynew = point.x * s + point.y * c;
 
-    return {xNew, yNew};
+    // Translate point back
+    point.x = xnew + origin.x;
+    point.y = ynew + origin.y;
+
+    return point;
 }
 
-// Function to rotate the trapezoid
-void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, double angleDegrees)
+void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle)
 {
-    // Rotate each vertex around the origin position
-    trapezoid.p1 = rotatePoint(trapezoid.p1, trapezoid.originPos, angleDegrees);
-    trapezoid.p2 = rotatePoint(trapezoid.p2, trapezoid.originPos, angleDegrees);
-    trapezoid.p3 = rotatePoint(trapezoid.p3, trapezoid.originPos, angleDegrees);
-    trapezoid.p4 = rotatePoint(trapezoid.p4, trapezoid.originPos, angleDegrees);
+    trapezoid.p1 = rotatePoint(trapezoid.originPos, trapezoid.p1, angle);
+    trapezoid.p2 = rotatePoint(trapezoid.originPos, trapezoid.p2, angle);
+    trapezoid.p3 = rotatePoint(trapezoid.originPos, trapezoid.p3, angle);
+    trapezoid.p4 = rotatePoint(trapezoid.originPos, trapezoid.p4, angle);
 }
 
 // Function to reposition the trapezoid
@@ -63,4 +65,15 @@ void repositionTrapezoid(IsoscelesTrapezoid &trapezoid, const Position &newOrigi
     trapezoid.p3.y += dy;
     trapezoid.p4.x += dx;
     trapezoid.p4.y += dy;
+}
+
+float angleDifference(float angle1, float angle2)
+{
+    float diff = std::fmod(angle2 - angle1, 360.0f);
+    if (diff < -180.0f)
+        diff += 360.0f;
+    else if (diff > 180.0f)
+        diff -= 360.0f;
+
+    return diff;
 }

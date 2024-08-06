@@ -5,6 +5,8 @@
 #include "gridHelpers.h"
 #include "raylib.h"
 #include "selectionHelpers.h"
+#include "geometryHelpers.h"
+#include "raymath.h"
 
 bool isRectangleInViewport(const Rectangle &rect, const Camera2D &camera);
 void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, Ability *&selectedAbility, Tile *&hoveredTile);
@@ -14,3 +16,5 @@ void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&ho
 void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, Camera2D &camera);
 void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex);
 void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera);
+void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile);
+void DEBUGsDrawFacingAngleIndicator(Unit *&selectedUnit);

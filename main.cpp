@@ -13,14 +13,6 @@
 #include "include/abilityHelpers.h"
 #include "include/destructionHelpers.h"
 
-// slot related functions
-// Example function that emits a signal with a payload
-void exampleFunction(Signal<std::string> &signal)
-{
-    std::cout << "Inside example function, emitting signal with payload...\n";
-    signal.emit("Hello, world!");
-}
-
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
@@ -74,18 +66,11 @@ int main(void)
     // UI Modes
 
     // define signals
-    // Signal<Position> mouseClickSignal;
-    // Signal<Unit> unitClickSignal;
-    // Signal<Unit> unitHoverSignal;
-    // Signal<Tile> tileClickSignal;
-    // Signal<Tile> tileHoverSignal;
-    // Signal<Ability> selectAbilitySignal;
-    // Signal<Ability, Unit> useAbilityOnUnit;
+    // Signal<PrepareTrapezoidRotationPayload> prepareTrapezoidRotationSignal;
 
-    // connect signal slots
-    // Connect slot to handle UIButton click
-    // buttonClickedSignal.connect([&](const ButtonName &buttonName)
-    //                             { handleUIButtonClick(buttonName, isPlacingUnit, unitToPlace, selectedButtonName, isPrepareMoveMode, isSelectingTarget); });
+    // // connect signal slots
+    // prepareTrapezoidRotationSignal.connect([&](const PrepareTrapezoidRotationPayload &payload)
+    //                                        { setVisionTrapezoidRotation(payload); });
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
     SetWindowPosition(0, 0);
@@ -162,6 +147,8 @@ int main(void)
         sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
         sDrawRotationChevron(allUnits, camera, chevronTex);
         sDrawVisionTrapezoids(allUnits, camera);
+        DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
+        DEBUGsDrawFacingAngleIndicator(selectedUnit);
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode

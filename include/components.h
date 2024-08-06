@@ -136,7 +136,7 @@ struct Unit
     UnitType unitType;
     std::string uuid;
     Position pos;
-    CardinalDirection facingDirection;
+    float facingAngle;
     IsoscelesTrapezoid visionTrapezoid;
     float health;
     float attack;

@@ -171,3 +171,35 @@ void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera)
         }
     }
 }
+
+void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile)
+{
+    if (selectedUnit && hoveredTile)
+    {
+        Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
+        Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
+        float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, hoveredTileCenter);
+        DrawLine(selectedUnitCenter.x, selectedUnitCenter.y, hoveredTileCenter.x, hoveredTileCenter.y, WHITE);
+        DrawText(TextFormat("%0.2f", angleToRotationTarget), hoveredTileCenter.x, hoveredTileCenter.y, 16, WHITE);
+    }
+}
+
+void DEBUGsDrawFacingAngleIndicator(Unit *&selectedUnit)
+{
+    if (selectedUnit)
+    {
+        Position selectedUnitCenter = getRectCenter({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
+        float selectedUnitFacingAngle = selectedUnit->facingAngle;
+        float lineLength = 64.0f;
+
+        // Convert angle to radians
+        float angleInRadians = selectedUnitFacingAngle * (M_PI / 180.0f);
+
+        // Calculate end point
+        float endX = selectedUnitCenter.x + lineLength * std::cos(angleInRadians);
+        float endY = selectedUnitCenter.y + lineLength * std::sin(angleInRadians);
+
+        // Draw the line
+        DrawLine(selectedUnitCenter.x, selectedUnitCenter.y, endX, endY, WHITE);
+    }
+}

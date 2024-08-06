@@ -6,6 +6,7 @@
 
 float getAngleBetweenPoints(Position p1, Position p2);
 Position getRectCenter(Rectangle rect);
-Position rotatePoint(const Position &point, const Position &center, float angleDegrees);
-void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, double angleDegrees);
-void repositionTrapezoid(IsoscelesTrapezoid &trapezoid, const Position &newOriginPos);
+Position rotatePoint(Position origin, Position point, float angleRadians);
+Position rotatePoint(Position origin, Position point, float angle);
+void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);
+float angleDifference(float angle1, float angle2);
