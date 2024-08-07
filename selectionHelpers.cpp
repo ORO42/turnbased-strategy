@@ -21,7 +21,7 @@ Unit getUnitById(std::string uuid, std::vector<Unit> &allUnits)
 // {
 // }
 
-void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Unit> &allUnits, Vector2 &worldMousePos)
+void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Unit> &allUnits, Vector2 &worldMousePos, Player &player)
 {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
@@ -29,19 +29,22 @@ void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Uni
 
         for (auto &unit : allUnits)
         {
-            if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+            if (shouldRenderUnitDueToVisibility(unit, player))
             {
-                // TODO only can select units that belong to your team
-                selectedUnit = &unit;
-                if (selectedUnit->team == Teams::BLUETEAM)
+                if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
                 {
-                    std::cout << "BLUETEAM" << std::endl;
+                    // TODO only can select units that belong to your team
+                    selectedUnit = &unit;
+                    if (selectedUnit->team == Teams::BLUETEAM)
+                    {
+                        std::cout << "BLUETEAM" << std::endl;
+                    }
+                    if (selectedUnit->team == Teams::REDTEAM)
+                    {
+                        std::cout << "REDTEAM" << std::endl;
+                    }
+                    break; // Exit the loop once a unit is selected
                 }
-                if (selectedUnit->team == Teams::REDTEAM)
-                {
-                    std::cout << "REDTEAM" << std::endl;
-                }
-                break; // Exit the loop once a unit is selected
             }
         }
     }

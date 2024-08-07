@@ -121,7 +121,7 @@ int main(void)
 
         sKeyInputMoveCamera(camera);
         sTileHover(allTiles, hoveredTile, worldMousePos);
-        sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos);
+        sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos, player);
         sAutoDeselectAbility(selectedUnit, selectedAbility);
         sSelectAbility(selectedUnit, selectedAbility, worldMousePos);
         sUseAbility(selectedUnit, selectedAbility, hoveredTile, player, allUnits, allObstacles);
