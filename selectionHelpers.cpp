@@ -29,7 +29,7 @@ void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Uni
 
         for (auto &unit : allUnits)
         {
-            if (shouldRenderUnitDueToVisibility(unit, player))
+            if (shouldRenderUnitDueToVisibility(unit, player) && unit.team == player.team)
             {
                 if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
                 {
