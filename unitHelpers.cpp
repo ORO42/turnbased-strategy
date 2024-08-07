@@ -4,6 +4,7 @@ void createUnit(
     UnitType unitType,
     Position pos,
     Player &player,
+    Teams team,
     std::vector<Unit> &allUnits,
     Texture2D &unitTex)
 {
@@ -17,7 +18,7 @@ void createUnit(
     newUnit.health = 100.0f;
     newUnit.xp = 0.0f;
     newUnit.turnsAliveCt = 0;
-    newUnit.team = player.team;
+    newUnit.team = team;
     newUnit.isVisibleToOppositeTeam = false;
     // newUnit.visionTrapezoid = (IsoscelesTrapezoid){(Position){}, (Position){}, (Position){}, (Position){}};
 
@@ -101,9 +102,62 @@ void sPositionVisionTrapezoids(std::vector<Unit> &allUnits)
         float northAngle = -90.0f;
 
         float angleDelta = angleDifference(northAngle, unit.facingAngle);
-        std::cout << angleDelta << std::endl;
 
         rotateTrapezoid(trapezoid, angleDelta);
         unit.visionTrapezoid = trapezoid;
+    }
+}
+
+void sVisibility(std::vector<Unit> &allUnits, Player &player)
+{
+    for (auto &unit : allUnits)
+    {
+        IsoscelesTrapezoid trap1 = unit.visionTrapezoid;
+
+        for (auto &unit2 : allUnits)
+        {
+            if (unit2.uuid != unit.uuid)
+            {
+                if (unit.team != unit2.team)
+                {
+                    if (checkTrapRectOverlap(trap1, {unit2.pos.x, unit2.pos.y, static_cast<float>(unit2.tex.width), static_cast<float>(unit2.tex.height)}))
+                    {
+                        unit2.isVisibleToOppositeTeam = true;
+                    }
+                    else
+                    {
+                        unit2.isVisibleToOppositeTeam = false;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// NOTE it seems there is overlap on the top corners of the trapezoid even though the trap doesn't extend into that tile
+void DEBUGsHoveredTileOverlappingTrap(Tile *&hoveredTile, std::vector<Unit> &allUnits)
+{
+    for (auto &unit : allUnits)
+    {
+        if (checkTrapRectOverlap(unit.visionTrapezoid, {hoveredTile->pos.x, hoveredTile->pos.y, 32.0f, 32.0f}))
+        {
+            std::cout << "OVERLAP" << std::endl;
+        }
+        else
+        {
+            std::cout << "NO OVERLAP" << std::endl;
+        }
+    }
+}
+
+bool shouldRenderUnitDueToVisibility(Unit &unit, Player &player)
+{
+    if ((unit.team != player.team && unit.isVisibleToOppositeTeam) || unit.team == player.team)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }

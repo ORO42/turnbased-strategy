@@ -6,7 +6,6 @@
 
 float getAngleBetweenPoints(Position p1, Position p2);
 Position getRectCenter(Rectangle rect);
-Position rotatePoint(Position origin, Position point, float angleRadians);
-Position rotatePoint(Position origin, Position point, float angle);
 void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);
 float angleDifference(float angle1, float angle2);
+bool checkTrapRectOverlap(const IsoscelesTrapezoid &trap, const Rectangle &rect);

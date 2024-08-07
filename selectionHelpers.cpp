@@ -33,6 +33,14 @@ void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Uni
             {
                 // TODO only can select units that belong to your team
                 selectedUnit = &unit;
+                if (selectedUnit->team == Teams::BLUETEAM)
+                {
+                    std::cout << "BLUETEAM" << std::endl;
+                }
+                if (selectedUnit->team == Teams::REDTEAM)
+                {
+                    std::cout << "REDTEAM" << std::endl;
+                }
                 break; // Exit the loop once a unit is selected
             }
         }

@@ -114,7 +114,7 @@ void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&ho
     }
 }
 
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, Camera2D &camera)
+void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, Camera2D &camera, Player &player)
 {
     for (auto &tile : allTiles)
     {
@@ -127,7 +127,7 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
 
     for (auto &unit : allUnits)
     {
-        if ((unit.team == Teams::REDTEAM && unit.isVisibleToOppositeTeam) || unit.team == Teams::BLUETEAM)
+        if (shouldRenderUnitDueToVisibility(unit, player))
         {
             if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
             {
@@ -137,37 +137,43 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
     }
 }
 
-void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex)
+void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, Player &player)
 {
     for (auto &unit : allUnits)
     {
         if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
         {
-            DrawTextureEx(chevronTex, {unit.pos.x, unit.pos.y}, 90.0f + 45.0f, 1.0f, WHITE);
+            if (shouldRenderUnitDueToVisibility(unit, player))
+            {
+                DrawTextureEx(chevronTex, {unit.pos.x, unit.pos.y}, 90.0f + 45.0f, 1.0f, WHITE);
+            }
         }
     }
 }
 
-void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera)
+void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player &player)
 {
     for (auto &unit : allUnits)
     {
         if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
         {
-            Position originPos = unit.visionTrapezoid.originPos;
-            Position p1 = unit.visionTrapezoid.p1;
-            Position p2 = unit.visionTrapezoid.p2;
-            Position p3 = unit.visionTrapezoid.p3;
-            Position p4 = unit.visionTrapezoid.p4;
-            DrawText(TextFormat("%s", "oP"), originPos.x, originPos.y, 16, RED);
-            DrawLineV({p1.x, p1.y}, {p2.x, p2.y}, ORANGE);
-            DrawText(TextFormat("%s", "p1"), p1.x, p1.y, 16, RED);
-            DrawLineV({p2.x, p2.y}, {p3.x, p3.y}, ORANGE);
-            DrawText(TextFormat("%s", "p2"), p2.x, p2.y, 16, RED);
-            DrawLineV({p3.x, p3.y}, {p4.x, p4.y}, ORANGE);
-            DrawText(TextFormat("%s", "p3"), p3.x, p3.y, 16, RED);
-            DrawLineV({p4.x, p4.y}, {p1.x, p1.y}, ORANGE);
-            DrawText(TextFormat("%s", "p4"), p4.x, p4.y, 16, RED);
+            if (shouldRenderUnitDueToVisibility(unit, player))
+            {
+                Position originPos = unit.visionTrapezoid.originPos;
+                Position p1 = unit.visionTrapezoid.p1;
+                Position p2 = unit.visionTrapezoid.p2;
+                Position p3 = unit.visionTrapezoid.p3;
+                Position p4 = unit.visionTrapezoid.p4;
+                // DrawText(TextFormat("%s", "oP"), originPos.x, originPos.y, 16, RED);
+                DrawLineV({p1.x, p1.y}, {p2.x, p2.y}, ORANGE);
+                // DrawText(TextFormat("%s", "p1"), p1.x, p1.y, 16, RED);
+                DrawLineV({p2.x, p2.y}, {p3.x, p3.y}, ORANGE);
+                // DrawText(TextFormat("%s", "p2"), p2.x, p2.y, 16, RED);
+                DrawLineV({p3.x, p3.y}, {p4.x, p4.y}, ORANGE);
+                // DrawText(TextFormat("%s", "p3"), p3.x, p3.y, 16, RED);
+                DrawLineV({p4.x, p4.y}, {p1.x, p1.y}, ORANGE);
+                // DrawText(TextFormat("%s", "p4"), p4.x, p4.y, 16, RED);
+            }
         }
     }
 }

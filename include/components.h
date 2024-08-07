@@ -51,23 +51,11 @@ enum struct Stance
     NA
 };
 
-enum struct CardinalDirection
-{
-    N,
-    S,
-    E,
-    W,
-    NE,
-    NW,
-    SE,
-    SW
-};
-
 struct Player
 {
     float ap;
     float xp;
-    Teams team = Teams::BLUETEAM;
+    Teams team;
     // float food;
     // float oil;
     // float ammo;

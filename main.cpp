@@ -101,12 +101,13 @@ int main(void)
     Player player = {10.0f, 0.0f};
     player.ap = 24.0f;
     player.xp = 0.0f;
+    player.team = Teams::BLUETEAM;
 
     Vector2 screenMousePos;
     Vector2 worldMousePos;
 
-    createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, allUnits, unitTex);
-    // createUnit(UnitType::RIFLEMAN, {384.0f, 384.0f}, player, allUnits, unitTex);
+    createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
+    createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f + 32.0f * 2}, player, Teams::REDTEAM, allUnits, unitTex);
 
     //--------------------------------------------------------------------------------------
 
@@ -126,6 +127,8 @@ int main(void)
         sUseAbility(selectedUnit, selectedAbility, hoveredTile, player, allUnits, allObstacles);
         sClearStates(selectedUnit, selectedAbility);
         sPositionVisionTrapezoids(allUnits);
+        sVisibility(allUnits, player);
+        // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
         sDestroyObstacles(allObstacles);
@@ -141,12 +144,12 @@ int main(void)
 
         BeginMode2D(camera);
 
-        sDrawAllTextures(allUnits, allTiles, camera);
+        sDrawAllTextures(allUnits, allTiles, camera, player);
         sDrawSelectedUnitIndicator(selectedUnit);
         sDrawHoveredTileIndicator(hoveredTile, selectedAbility);
         sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
-        sDrawRotationChevron(allUnits, camera, chevronTex);
-        sDrawVisionTrapezoids(allUnits, camera);
+        sDrawRotationChevron(allUnits, camera, chevronTex, player);
+        sDrawVisionTrapezoids(allUnits, camera, player);
         DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
         DEBUGsDrawFacingAngleIndicator(selectedUnit);
 
