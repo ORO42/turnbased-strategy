@@ -145,6 +145,18 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
                 useAbility = true;
             }
         }
+        if (selectedAbility->abilityType == AbilityTypes::MOVE)
+        {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+            {
+                Rectangle reachRadiusRect = createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, selectedAbility->reachRadius);
+                if (CheckCollisionRecs(reachRadiusRect, {hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}))
+                {
+                    selectedUnit->movePoint = {hoveredTile->pos.x, hoveredTile->pos.y};
+                    useAbility = true;
+                }
+            }
+        }
 
         if (useAbility)
         {

@@ -53,6 +53,7 @@ int main(void)
     // my vars
     int currentFrame;
     int currentTurn;
+    float deltaTime;
     Unit *selectedUnit = nullptr;
     Unit *hoveredUnit = nullptr;
     Tile *hoveredTile = nullptr;
@@ -118,6 +119,7 @@ int main(void)
         // Update
         screenMousePos = GetMousePosition();
         worldMousePos = GetScreenToWorld2D(screenMousePos, camera);
+        deltaTime = GetFrameTime();
 
         sKeyInputMoveCamera(camera);
         sTileHover(allTiles, hoveredTile, worldMousePos);
@@ -128,6 +130,7 @@ int main(void)
         sClearStates(selectedUnit, selectedAbility);
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player);
+        sMoveUnits(allUnits, deltaTime);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
@@ -150,8 +153,10 @@ int main(void)
         sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
         sDrawRotationChevron(allUnits, camera, chevronTex, player);
         sDrawVisionTrapezoids(allUnits, camera, player);
-        DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
-        DEBUGsDrawFacingAngleIndicator(selectedUnit);
+        // DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
+        sDrawFacingAngleIndicator(allUnits, player);
+        sDrawMoveModeUI(selectedAbility, selectedUnit, hoveredTile);
+        sDrawReachRadiusRect(selectedAbility, selectedUnit);
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode

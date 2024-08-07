@@ -190,22 +190,53 @@ void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile)
     }
 }
 
-void DEBUGsDrawFacingAngleIndicator(Unit *&selectedUnit)
+void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player)
 {
-    if (selectedUnit)
+    for (auto &unit : allUnits)
     {
-        Position selectedUnitCenter = getRectCenter({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
-        float selectedUnitFacingAngle = selectedUnit->facingAngle;
-        float lineLength = 64.0f;
+        if (shouldRenderUnitDueToVisibility(unit, player))
+        {
+            Position unitCenter = getRectCenter({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)});
+            float unitFacingAngle = unit.facingAngle;
+            float lineLength = 64.0f;
 
-        // Convert angle to radians
-        float angleInRadians = selectedUnitFacingAngle * (M_PI / 180.0f);
+            // Convert angle to radians
+            float angleInRadians = unitFacingAngle * (M_PI / 180.0f);
 
-        // Calculate end point
-        float endX = selectedUnitCenter.x + lineLength * std::cos(angleInRadians);
-        float endY = selectedUnitCenter.y + lineLength * std::sin(angleInRadians);
+            // Calculate end point
+            float endX = unitCenter.x + lineLength * std::cos(angleInRadians);
+            float endY = unitCenter.y + lineLength * std::sin(angleInRadians);
 
-        // Draw the line
-        DrawLine(selectedUnitCenter.x, selectedUnitCenter.y, endX, endY, WHITE);
+            // Draw the line
+            DrawLine(unitCenter.x, unitCenter.y, endX, endY, WHITE);
+        }
+    }
+}
+
+void sDrawMoveModeUI(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile)
+{
+    if (selectedAbility && selectedAbility->abilityType == AbilityTypes::MOVE)
+    {
+        Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
+        Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
+        int chebDist = chebyshevTileDistance({selectedUnitCenter.x, selectedUnitCenter.y}, {hoveredTileCenter.x, hoveredTileCenter.y});
+        Rectangle reachRadiusRect = createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, selectedAbility->reachRadius);
+        Color color = RED;
+        if (CheckCollisionRecs(reachRadiusRect, {hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}))
+        {
+            color = GREEN;
+        }
+        DrawLine(selectedUnitCenter.x, selectedUnitCenter.y, hoveredTileCenter.x, hoveredTileCenter.y, color);
+        DrawRectangleLinesEx({hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, 1.0, color);
+        DrawText(TextFormat("%d", chebDist), hoveredTileCenter.x, hoveredTileCenter.y, 16, color);
+    }
+}
+
+void sDrawReachRadiusRect(Ability *&selectedAbility, Unit *&selectedUnit)
+{
+    if (selectedAbility && selectedAbility->reachRadius > 0)
+    {
+        Rectangle reachRadiusRect = createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, selectedAbility->reachRadius);
+        DrawRectangleLinesEx({reachRadiusRect.x, reachRadiusRect.y, (reachRadiusRect.width), (reachRadiusRect.height)}, 1.0, WHITE);
     }
 }

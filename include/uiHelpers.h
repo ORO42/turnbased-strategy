@@ -18,4 +18,6 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
 void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, Player &player);
 void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player &player);
 void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile);
-void DEBUGsDrawFacingAngleIndicator(Unit *&selectedUnit);
+void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player);
+void sDrawMoveModeUI(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile);
+void sDrawReachRadiusRect(Ability *&selectedAbility, Unit *&selectedUnit);
