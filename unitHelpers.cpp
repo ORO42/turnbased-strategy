@@ -22,33 +22,30 @@ void createUnit(
     newUnit.isVisibleToOppositeTeam = false;
     // newUnit.visionTrapezoid = (IsoscelesTrapezoid){(Position){}, (Position){}, (Position){}, (Position){}};
 
-    Ability attackAbility;
-    attackAbility.uuid = generateUUID();
-    attackAbility.abilityType = AbilityTypes::ATTACK;
-    attackAbility.displayTitle = "Attack";
-    attackAbility.playerApCost = 0.0f;
-    attackAbility.playerXpRequirement = 0.0f;
-    attackAbility.unitApCost = 1.0f;
-    attackAbility.unitXpRequirement = 0.0f;
-    attackAbility.damage = 25.0f;
-    attackAbility.turnCooldown = 0;
-    attackAbility.lastTurnUsed = 0;
-    attackAbility.useQty = false;
-    attackAbility.qty = 0;
-    attackAbility.isQtyReplenishable = false;
-    attackAbility.reachRadius = 10;
-    attackAbility.effectRadius = 0; // NOTE 0 means just a single tile
-    attackAbility.canAffectUnit = true;
-    attackAbility.canAffectObstacle = false;
-    attackAbility.canAffectTile = false;
-    attackAbility.canAffectSelf = false;
-    attackAbility.onlyAffectsSelf = false;
-    attackAbility.placesUnit = UnitType::NA;
+    Ability rifleAbility;
+    rifleAbility.uuid = generateUUID();
+    rifleAbility.abilityType = AbilityTypes::RIFLE;
+    rifleAbility.displayTitle = "Rifle";
+    rifleAbility.isPlayerAbility = false;
+    rifleAbility.playerApCost = 0.0f;
+    rifleAbility.playerXpRequirement = 0.0f;
+    rifleAbility.unitApCost = 1.0f;
+    rifleAbility.unitXpRequirement = 0.0f;
+    rifleAbility.damage = 25.0f;
+    rifleAbility.turnCooldown = 0;
+    rifleAbility.lastTurnUsed = 0;
+    rifleAbility.useQty = false;
+    rifleAbility.qty = 0;
+    rifleAbility.isQtyReplenishable = false;
+    rifleAbility.reachRadius = 10;
+    rifleAbility.effectRadius = 0; // NOTE 0 means just a single tile
+    rifleAbility.placesUnit = UnitType::NA;
 
     Ability rotateAbility;
     rotateAbility.uuid = generateUUID();
     rotateAbility.abilityType = AbilityTypes::ROTATE;
     rotateAbility.displayTitle = "Rotate";
+    rotateAbility.isPlayerAbility = false;
     rotateAbility.playerApCost = 0.0f;
     rotateAbility.playerXpRequirement = 0.0f;
     rotateAbility.unitApCost = 1.0f;
@@ -59,19 +56,15 @@ void createUnit(
     rotateAbility.useQty = false;
     rotateAbility.qty = 0;
     rotateAbility.isQtyReplenishable = false;
-    rotateAbility.reachRadius = 99999;
-    rotateAbility.effectRadius = 0; // NOTE 0 means just a single tile
-    rotateAbility.canAffectUnit = false;
-    rotateAbility.canAffectObstacle = false;
-    rotateAbility.canAffectTile = false;
-    rotateAbility.canAffectSelf = false;
-    rotateAbility.onlyAffectsSelf = false;
+    rotateAbility.reachRadius = -1;
+    rotateAbility.effectRadius = -1; // NOTE 0 means just a single tile
     rotateAbility.placesUnit = UnitType::NA;
 
     Ability moveAbility;
     moveAbility.uuid = generateUUID();
     moveAbility.abilityType = AbilityTypes::MOVE;
     moveAbility.displayTitle = "Move";
+    moveAbility.isPlayerAbility = false;
     moveAbility.playerApCost = 0.0f;
     moveAbility.playerXpRequirement = 0.0f;
     moveAbility.unitApCost = 1.0f;
@@ -83,12 +76,7 @@ void createUnit(
     moveAbility.qty = 0;
     moveAbility.isQtyReplenishable = false;
     moveAbility.reachRadius = 5;
-    moveAbility.effectRadius = 0; // NOTE 0 means just a single tile
-    moveAbility.canAffectUnit = false;
-    moveAbility.canAffectObstacle = false;
-    moveAbility.canAffectTile = false;
-    moveAbility.canAffectSelf = false;
-    moveAbility.onlyAffectsSelf = false;
+    moveAbility.effectRadius = -1; // NOTE 0 means just a single tile
     moveAbility.placesUnit = UnitType::NA;
 
     if (unitType == UnitType::RIFLEMAN)
@@ -97,7 +85,7 @@ void createUnit(
         newUnit.accuracy = 1.0f;
         newUnit.maxAp = 10.0f;
         newUnit.ap = 10.0f;
-        newUnit.abilities = std::vector<Ability>{moveAbility, rotateAbility, attackAbility};
+        newUnit.abilities = std::vector<Ability>{moveAbility, rotateAbility, rifleAbility};
 
         newUnit.tex = unitTex;
 
@@ -105,6 +93,7 @@ void createUnit(
         newUnit.viewWidth = 6; // NOTE: should be multiples of 2
 
         newUnit.movePoint = {-1.0f, -1.0f};
+        newUnit.projectileStoppage = ProjectileStoppage::SOMETIMES;
     }
 
     allUnits.push_back(newUnit);
@@ -133,6 +122,7 @@ void sPositionVisionTrapezoids(std::vector<Unit> &allUnits)
 
 void sVisibility(std::vector<Unit> &allUnits, Player &player)
 {
+    // std::vector<Unit> unitsInTrap = {};
     for (auto &unit : allUnits)
     {
         IsoscelesTrapezoid trap1 = unit.visionTrapezoid;
@@ -145,6 +135,7 @@ void sVisibility(std::vector<Unit> &allUnits, Player &player)
                 {
                     if (checkTrapRectOverlap(trap1, {unit2.pos.x, unit2.pos.y, static_cast<float>(unit2.tex.width), static_cast<float>(unit2.tex.height)}))
                     {
+                        // TODO cast ray to each unit, check if overlap any obstacles
                         unit2.isVisibleToOppositeTeam = true;
                     }
                     else
@@ -175,14 +166,7 @@ void DEBUGsHoveredTileOverlappingTrap(Tile *&hoveredTile, std::vector<Unit> &all
 
 bool shouldRenderUnitDueToVisibility(Unit &unit, Player &player)
 {
-    if ((unit.team != player.team && unit.isVisibleToOppositeTeam) || unit.team == player.team)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (unit.team != player.team && unit.isVisibleToOppositeTeam) || unit.team == player.team;
 }
 
 // Function to move units smoothly
@@ -190,6 +174,7 @@ void sMoveUnits(std::vector<Unit> &allUnits, float deltaTime)
 {
     for (auto &unit : allUnits)
     {
+        // TODO make generic move function
         if (unit.movePoint.x != -1.0f || unit.movePoint.y != -1.0)
         {
             // Calculate direction to move towards
@@ -218,5 +203,32 @@ void sMoveUnits(std::vector<Unit> &allUnits, float deltaTime)
                 }
             }
         }
+    }
+}
+
+bool isMouseOverAnyUnit(std::vector<Unit> &allUnits, Vector2 &worldMousePos)
+{
+    for (auto &unit : allUnits)
+    {
+        if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void sUnitHover(std::vector<Unit> &allUnits, Unit *&hoveredUnit, Vector2 &worldMousePos)
+{
+    for (auto &unit : allUnits)
+    {
+        if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+        {
+            hoveredUnit = &unit;
+        }
+        // else
+        // {
+        //     hoveredUnit = nullptr;
+        // }
     }
 }

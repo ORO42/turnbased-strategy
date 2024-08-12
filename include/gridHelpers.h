@@ -12,3 +12,4 @@ Rectangle createRectAroundRect(const Rectangle &innerRect, const int &radius);
 std::vector<Tile> getTilesInRect(const Rectangle &rect, const int &radius, std::vector<Tile> &allTiles);
 void createGridSubdivisions(std::vector<GridSubdivision> &allGridSubdivisions, const std::vector<Tile> &allTiles, int width, int height, int numSegmentsX, int numSegmentsY);
 std::vector<Tile> getAllTilesSubdivRectCollision(std::vector<GridSubdivision> &allGridSubdivisions, Rectangle rect);
+Tile getTileForPointFromSubdivs(Position &p, std::vector<GridSubdivision> &allGridSubdivisions);

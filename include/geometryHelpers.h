@@ -9,3 +9,5 @@ Position getRectCenter(Rectangle rect);
 void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);
 float angleDifference(float angle1, float angle2);
 bool checkTrapRectOverlap(const IsoscelesTrapezoid &trap, const Rectangle &rect);
+bool lineRectOverlap(Rectangle rect, Line line);
+std::vector<Line> getCornerToCornerLines(Rectangle rect1, Rectangle rect2);

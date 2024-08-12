@@ -1,0 +1,61 @@
+- Player abilities
+
+    - Mortar Strike
+        - Damages units and obstacles in a radius
+    
+    - Air Strike
+
+    - Advanced Rifling
+
+    - 
+
+- Unit abilities
+
+    - Move
+
+    - Rifle
+
+    - Machine Gun
+
+    - Suppress
+
+    - Precise Shot
+
+    - 40mm
+
+    - Grenade
+
+    - Take Supplies
+
+    - Reload
+
+    - Build unit
+
+    - Mortar
+        - Fires 1 projectile that can land anywhere in a radius which damages a radius on impact
+
+    - Mortar Volley
+        - Fires 3 projectiles, each can land anywhere in a radius, which each damage a radius on impact
+
+    - Rocket
+    
+    - Rocket Volley
+
+    - Heal unit
+
+    - Heal radius
+
+    - Binoculars
+
+    - Flare
+
+Attack Ability Logic
+    1. Select unit
+    2. Hover target
+    3. If any obstacles in path of target that are impenetrable, cannot attack, else if projectile overrides impenetrable
+    4. If projectile causes explosion, check if LOS / destroy impenetrable LOS blocker in same frame and deal damage
+
+Penetration Alternative:
+    1. If colliding with unit/obstacle, use unit/obstacle's stopChance
+    2. If colliding with destination position, stop chance = 100
+    3. Roll stop chance

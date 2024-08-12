@@ -99,7 +99,7 @@ void sDrawSelectedUnitIndicator(Unit *&selectedUnit)
 
 void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility)
 {
-    if (!selectedAbility)
+    if (!selectedAbility && hoveredTile)
     {
         DrawRectangleLinesEx({hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, 0.5, YELLOW);
     }
@@ -107,14 +107,14 @@ void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility)
 
 void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile)
 {
-    if (selectedAbility)
+    if (selectedAbility && selectedUnit && hoveredTile)
     {
         Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
         DrawRectangleLinesEx({effectRadiusRect.x, effectRadiusRect.y, effectRadiusRect.width, effectRadiusRect.height}, 0.5, BLUE);
     }
 }
 
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, Camera2D &camera, Player &player)
+void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player)
 {
     for (auto &tile : allTiles)
     {
@@ -133,6 +133,14 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
             {
                 DrawTexture(unit.tex, unit.pos.x, unit.pos.y, WHITE);
             }
+        }
+    }
+
+    for (auto &projectile : allProjectiles)
+    {
+        if (isRectangleInViewport({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, camera))
+        {
+            DrawTexture(projectile.tex, projectile.currentPos.x, projectile.currentPos.y, WHITE);
         }
     }
 }
@@ -213,16 +221,16 @@ void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player)
     }
 }
 
-void sDrawMoveModeUI(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile)
+void sDrawDistanceIndicators(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile, std::vector<Obstacle> &allObstacles, std::vector<Unit> &allUnits, Vector2 &worldMousePos)
 {
-    if (selectedAbility && selectedAbility->abilityType == AbilityTypes::MOVE)
+    if (selectedAbility && selectedUnit && selectedAbility->reachRadius > -1)
     {
         Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
         Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
         int chebDist = chebyshevTileDistance({selectedUnitCenter.x, selectedUnitCenter.y}, {hoveredTileCenter.x, hoveredTileCenter.y});
         Rectangle reachRadiusRect = createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, selectedAbility->reachRadius);
         Color color = RED;
-        if (CheckCollisionRecs(reachRadiusRect, {hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}))
+        if (CheckCollisionRecs(reachRadiusRect, {hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}) && !isMouseOverAnyObstacle(allObstacles, worldMousePos) && !isMouseOverAnyUnit(allUnits, worldMousePos))
         {
             color = GREEN;
         }

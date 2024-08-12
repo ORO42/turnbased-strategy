@@ -176,3 +176,86 @@ bool checkTrapRectOverlap(const IsoscelesTrapezoid &trap, const Rectangle &rect)
 
     return true; // Overlap on all axes
 }
+
+// Helper function to check if two lines intersect
+bool doLinesIntersect(Line &line1, Line &line2)
+{
+    auto orientation = [](float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        float val = (y2 - y1) * (x3 - x2) - (x2 - x1) * (y3 - y2);
+        if (val == 0)
+            return 0;             // collinear
+        return (val > 0) ? 1 : 2; // clock or counterclockwise
+    };
+
+    auto onSegment = [](float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        if (x2 <= std::max(x1, x3) && x2 >= std::min(x1, x3) && y2 <= std::max(y1, y3) && y2 >= std::min(y1, y3))
+            return true;
+        return false;
+    };
+
+    int o1 = orientation(line1.startX, line1.startY, line1.endX, line1.endY, line2.startX, line2.startY);
+    int o2 = orientation(line1.startX, line1.startY, line1.endX, line1.endY, line2.endX, line2.endY);
+    int o3 = orientation(line2.startX, line2.startY, line2.endX, line2.endY, line1.startX, line1.startY);
+    int o4 = orientation(line2.startX, line2.startY, line2.endX, line2.endY, line1.endX, line1.endY);
+
+    if (o1 != o2 && o3 != o4)
+        return true;
+
+    if (o1 == 0 && onSegment(line1.startX, line1.startY, line2.startX, line2.startY, line1.endX, line1.endY))
+        return true;
+    if (o2 == 0 && onSegment(line1.startX, line1.startY, line2.endX, line2.endY, line1.endX, line1.endY))
+        return true;
+    if (o3 == 0 && onSegment(line2.startX, line2.startY, line1.startX, line1.startY, line2.endX, line2.endY))
+        return true;
+    if (o4 == 0 && onSegment(line2.startX, line2.startY, line1.endX, line1.endY, line2.endX, line2.endY))
+        return true;
+
+    return false;
+}
+
+bool lineRectOverlap(Rectangle rect, Line line)
+{
+    Line rectSeg1 = {rect.x, rect.y, rect.x + rect.width, rect.y};
+    Line rectSeg2 = {rect.x + rect.width, rect.y, rect.x + rect.width, rect.y + rect.height};
+    Line rectSeg3 = {rect.x + rect.width, rect.y + rect.height, rect.x, rect.y + rect.height};
+    Line rectSeg4 = {rect.x, rect.y + rect.height, rect.x, rect.y};
+
+    return doLinesIntersect(line, rectSeg1) || doLinesIntersect(line, rectSeg2) || doLinesIntersect(line, rectSeg3) || doLinesIntersect(line, rectSeg4);
+}
+
+std::vector<Line> getCornerToCornerLines(Rectangle rect1, Rectangle rect2)
+{
+    std::vector<Line> lines;
+
+    // Define the corners of the first rectangle
+    std::vector<std::pair<float, float>> cornersRect1 = {
+        {rect1.x, rect1.y},                             // Top-left
+        {rect1.x + rect1.width, rect1.y},               // Top-right
+        {rect1.x, rect1.y + rect1.height},              // Bottom-left
+        {rect1.x + rect1.width, rect1.y + rect1.height} // Bottom-right
+    };
+
+    // Define the corners of the second rectangle
+    std::vector<std::pair<float, float>> cornersRect2 = {
+        {rect2.x, rect2.y},                             // Top-left
+        {rect2.x + rect2.width, rect2.y},               // Top-right
+        {rect2.x, rect2.y + rect2.height},              // Bottom-left
+        {rect2.x + rect2.width, rect2.y + rect2.height} // Bottom-right
+    };
+
+    // Create lines between every corner of rect1 and every corner of rect2
+    for (const auto &corner1 : cornersRect1)
+    {
+        for (const auto &corner2 : cornersRect2)
+        {
+            lines.push_back(Line{
+                corner1.first, corner1.second, // Start point (corner of rect1)
+                corner2.first, corner2.second  // End point (corner of rect2)
+            });
+        }
+    }
+
+    return lines;
+}

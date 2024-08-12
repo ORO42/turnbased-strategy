@@ -47,7 +47,11 @@ void sTileHover(std::vector<Tile> &allTiles, Tile *&hoveredTile, Vector2 &worldM
         if (CheckCollisionPointRec(worldMousePos, (Rectangle){tile.pos.x, tile.pos.y, 32.0f, 32.0f}))
         {
             hoveredTile = &tile;
-        };
+        }
+        // else
+        // {
+        //     hoveredTile = nullptr;
+        // }
     };
 }
 
@@ -84,7 +88,7 @@ Rectangle createRectAroundRect(const Rectangle &innerRect, const int &radius)
     Vector2 centerPoint = {innerRect.x + innerRect.width / 2,
                            innerRect.y + innerRect.height / 2};
 
-    DrawCircle(centerPoint.x, centerPoint.y, 3.0f, ORANGE);
+    DrawCircle(centerPoint.x, centerPoint.y, 3.0f, ORANGE); // TODO this is drawing two extra points under the tile map
 
     // Calculate the position and size of the outer rectangle
     float outerX = innerRect.x - radius * 32.0f;
@@ -183,4 +187,25 @@ std::vector<Tile> getAllTilesSubdivRectCollision(std::vector<GridSubdivision> &a
         }
     }
     return allTiles;
+}
+
+Tile getTileForPointFromSubdivs(Position &p, std::vector<GridSubdivision> &allGridSubdivisions)
+{
+    Tile foundTile = {};
+
+    for (auto gSubdiv : allGridSubdivisions)
+    {
+        if (CheckCollisionPointRec({p.x, p.y}, {gSubdiv.pos.x, gSubdiv.pos.y, gSubdiv.w, gSubdiv.h}))
+        {
+            for (auto tile : gSubdiv.tilesInSubdivision)
+            {
+                if (CheckCollisionPointRec({p.x, p.y}, {tile.pos.x, tile.pos.y, static_cast<float>(tile.tex.width), static_cast<float>(tile.tex.height)}))
+                {
+                    foundTile = tile;
+                }
+            }
+        }
+    }
+
+    return foundTile;
 }

@@ -57,11 +57,13 @@ int main(void)
     Unit *selectedUnit = nullptr;
     Unit *hoveredUnit = nullptr;
     Tile *hoveredTile = nullptr;
+    Obstacle *hoveredObstacle = nullptr;
     Ability *selectedAbility = nullptr;
     std::vector<Unit> allUnits;
     std::vector<Tile> allTiles;
     std::vector<Obstacle> allObstacles;
     std::vector<GridSubdivision> allGridSubdivisions;
+    std::vector<Projectile> allProjectiles;
     // std::unordered_map<UnitType, float> unitCreationCostPlayerAp = {{UnitType::ATSOLIDER, 10.0f}, {UnitType::ENGINEER, 15.0f}};
 
     // UI Modes
@@ -94,6 +96,7 @@ int main(void)
     Texture2D tunnelTex = LoadTexture("assets/tunnel.png");
     Texture2D wallTex = LoadTexture("assets/wall.png");
     Texture2D chevronTex = LoadTexture("assets/chevron.png");
+    Texture2D flyingProjectileTex = LoadTexture("assets/flying_projectile.png");
 
     // NOTE when a unit is selected, FPS tanks at higher gird size, indicating there is an optimization necessary for grid/tile related functions when the unit is selected. It is the sPrepareMove function
     setupRectangularGrid(192, 192, allTiles, grassTex);
@@ -108,6 +111,7 @@ int main(void)
     Vector2 worldMousePos;
 
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
+    createUnit(UnitType::RIFLEMAN, {320.0f + 32.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f + 32.0f * 2}, player, Teams::REDTEAM, allUnits, unitTex);
 
     //--------------------------------------------------------------------------------------
@@ -123,14 +127,19 @@ int main(void)
 
         sKeyInputMoveCamera(camera);
         sTileHover(allTiles, hoveredTile, worldMousePos);
+
+        // sUnitHover(allUnits, hoveredUnit, worldMousePos);
+        // sObstacleHover(allObstacles, hoveredObstacle, worldMousePos);
+
         sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos, player);
         sAutoDeselectAbility(selectedUnit, selectedAbility);
         sSelectAbility(selectedUnit, selectedAbility, worldMousePos);
-        sUseAbility(selectedUnit, selectedAbility, hoveredTile, player, allUnits, allObstacles);
+        sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, flyingProjectileTex);
         sClearStates(selectedUnit, selectedAbility);
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player);
         sMoveUnits(allUnits, deltaTime);
+        // sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
@@ -147,7 +156,7 @@ int main(void)
 
         BeginMode2D(camera);
 
-        sDrawAllTextures(allUnits, allTiles, camera, player);
+        sDrawAllTextures(allUnits, allTiles, allProjectiles, camera, player);
         sDrawSelectedUnitIndicator(selectedUnit);
         sDrawHoveredTileIndicator(hoveredTile, selectedAbility);
         sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
@@ -155,7 +164,7 @@ int main(void)
         sDrawVisionTrapezoids(allUnits, camera, player);
         // DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
         sDrawFacingAngleIndicator(allUnits, player);
-        sDrawMoveModeUI(selectedAbility, selectedUnit, hoveredTile);
+        sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
 
         EndMode2D();

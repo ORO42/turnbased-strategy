@@ -18,3 +18,5 @@ void sVisibility(std::vector<Unit> &allUnits, Player &player);
 void DEBUGsHoveredTileOverlappingTrap(Tile *&hoveredTile, std::vector<Unit> &allUnits);
 bool shouldRenderUnitDueToVisibility(Unit &unit, Player &player);
 void sMoveUnits(std::vector<Unit> &allUnits, float deltaTime);
+bool isMouseOverAnyUnit(std::vector<Unit> &allUnits, Vector2 &worldMousePos);
+void sUnitHover(std::vector<Unit> &allUnits, Unit *&hoveredUnit, Vector2 &worldMousePos);

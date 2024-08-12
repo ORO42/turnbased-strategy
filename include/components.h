@@ -9,9 +9,10 @@
 
 enum struct AbilityTypes
 {
-    ATTACK,
+    RIFLE,
     MOVE,
     ROTATE,
+    MORTAR_VOLLEY,
     NA,
 };
 
@@ -77,10 +78,10 @@ struct Position
 
 struct Line
 {
-    int startX;
-    int startY;
-    int endX;
-    int endY;
+    float startX;
+    float startY;
+    float endX;
+    float endY;
 };
 
 struct IsoscelesTrapezoid
@@ -92,11 +93,19 @@ struct IsoscelesTrapezoid
     Position p4;
 };
 
+enum struct ProjectileStoppage
+{
+    ALWAYS,
+    SOMETIMES,
+    NEVER,
+};
+
 struct Ability
 {
     std::string uuid;
     AbilityTypes abilityType;
     std::string displayTitle;
+    bool isPlayerAbility;
     float playerApCost;
     float playerXpRequirement;
     float unitApCost;
@@ -109,13 +118,7 @@ struct Ability
     bool isQtyReplenishable;
     int reachRadius;
     int effectRadius;
-    bool canAffectUnit;
-    bool canAffectTile;
-    bool canAffectObstacle;
-    bool canAffectSelf;
-    bool onlyAffectsSelf;
     UnitType placesUnit;
-    // bool selected = false;
 };
 
 struct Unit
@@ -142,7 +145,7 @@ struct Unit
     Position movePoint = {-1.0f, -1.0f};
     Teams team;
     bool isVisibleToOppositeTeam;
-    // IsoscelesTrapezoid visionTrapezoid;
+    ProjectileStoppage projectileStoppage;
 };
 
 struct Tile
@@ -162,8 +165,10 @@ struct Obstacle
     bool isNavigable;
     float cover; // counts against spot chance
     bool unitCanBeUnder;
-    std::vector<Stance> visibleInStance; // if a unit behind this obstacle and is in any of these stances, the unit can be seen
+    bool visibleInProne;    // units in this stance behind the obstacle will not be visible to other units between the obstacle and the unit
+    bool visibleInStanding; // units in this stance behind the obstacle will not be visible to other units between the obstacle and the unit
     float health = 0.0;
+    ProjectileStoppage projectileStoppage;
 };
 
 struct GridSubdivision
@@ -171,7 +176,7 @@ struct GridSubdivision
     Position pos;
     float w;
     float h;
-    std::vector<Tile> tilesInSubdivision;
+    std::vector<Tile> tilesInSubdivision; // TODO this needs to be a vector of pointers to references
     // after creating all tiles, create quads
     // for each quad, push_back a reference to all tiles intersecting the quad into the quad
     // to check tile collisions externally, get all the quads that are colliding, and iterate each quad's contained tiles
@@ -180,9 +185,18 @@ struct GridSubdivision
 struct Projectile
 {
     Texture2D tex;
-    Position originPos;
-    Position destinationPos;
-    int damage;
-    // float maxDistanceFromOrigin;
+    Position originPos;                     // TODO maybe these need to be rects
+    Position destinationPos = {-1.0, -1.0}; // TODO maybe these need to be rects
+    Position currentPos;
+    std::string originUnitUuid;
+    Teams team;
+    bool isAerial; // means the projectile doesn't collide with obstacles en route to destination
+    float facingAngle;
     float speed;
+    bool canCollideBeforeDestination; // determined by an initial accuracy roll when creating the projectile
+    bool shouldDestroy;               // if this projectile needs to be removed
+    bool causesExplosion;
+    int effectRadius;
+    float damage;
+    float accuracy; // the chance this projectile causes damage to each unit/obstacle
 };
