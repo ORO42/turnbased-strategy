@@ -1,12 +1,13 @@
 #include "include/obstacleHelpers.h"
 
 void createObstacle(
-    ObstacleType &obstacleType,
-    Position &pos,
+    ObstacleType obstacleType,
+    Position pos,
     Texture2D &tex,
     std::vector<Obstacle> &allObstacles)
 {
     Obstacle newObstacle;
+    newObstacle.uuid = generateUUID();
     newObstacle.obstacleType = obstacleType;
     newObstacle.pos = pos;
     newObstacle.tex = tex;

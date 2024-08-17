@@ -36,3 +36,16 @@ void sDestroyObstacles(std::vector<Obstacle> &allObstacles)
                                       }),
                        allObstacles.end());
 }
+
+void sDestroyProjectiles(std::vector<Projectile> &allProjectiles)
+{
+    allProjectiles.erase(std::remove_if(allProjectiles.begin(), allProjectiles.end(), [&](Projectile &projectile)
+                                        {
+                                            if (projectile.shouldDestroy)
+                                            {
+                                                return true; // should remove
+                                            }
+                                            return false; // Keep this unit
+                                        }),
+                         allProjectiles.end());
+}

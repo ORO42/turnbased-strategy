@@ -96,9 +96,8 @@ int main(void)
     Texture2D tunnelTex = LoadTexture("assets/tunnel.png");
     Texture2D wallTex = LoadTexture("assets/wall.png");
     Texture2D chevronTex = LoadTexture("assets/chevron.png");
-    Texture2D flyingProjectileTex = LoadTexture("assets/flying_projectile.png");
+    Texture2D projectileTex = LoadTexture("assets/projectile.png");
 
-    // NOTE when a unit is selected, FPS tanks at higher gird size, indicating there is an optimization necessary for grid/tile related functions when the unit is selected. It is the sPrepareMove function
     setupRectangularGrid(192, 192, allTiles, grassTex);
     createGridSubdivisions(allGridSubdivisions, allTiles, 192 * 32, 192 * 32, 8, 8);
 
@@ -110,9 +109,16 @@ int main(void)
     Vector2 screenMousePos;
     Vector2 worldMousePos;
 
+    Rectangle debug_endRect;
+
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
     createUnit(UnitType::RIFLEMAN, {320.0f + 32.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f + 32.0f * 2}, player, Teams::REDTEAM, allUnits, unitTex);
+    createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f}, wallTex, allObstacles);
+    createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 2}, wallTex, allObstacles);
+    createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 3}, wallTex, allObstacles);
+    createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 4}, wallTex, allObstacles);
+    createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 5}, wallTex, allObstacles);
 
     //--------------------------------------------------------------------------------------
 
@@ -134,16 +140,18 @@ int main(void)
         sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos, player);
         sAutoDeselectAbility(selectedUnit, selectedAbility);
         sSelectAbility(selectedUnit, selectedAbility, worldMousePos);
-        sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, flyingProjectileTex);
+        sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, projectileTex);
         sClearStates(selectedUnit, selectedAbility);
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player);
         sMoveUnits(allUnits, deltaTime);
-        // sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
+        sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime, debug_endRect);
+        sProjectileDamage(allProjectiles, allUnits, allObstacles);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
         sDestroyObstacles(allObstacles);
+        sDestroyProjectiles(allProjectiles);
 
         // Draw
         //----------------------------------------------------------------------------------
@@ -156,7 +164,7 @@ int main(void)
 
         BeginMode2D(camera);
 
-        sDrawAllTextures(allUnits, allTiles, allProjectiles, camera, player);
+        sDrawAllTextures(allUnits, allTiles, allObstacles, allProjectiles, camera, player);
         sDrawSelectedUnitIndicator(selectedUnit);
         sDrawHoveredTileIndicator(hoveredTile, selectedAbility);
         sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
@@ -166,10 +174,15 @@ int main(void)
         sDrawFacingAngleIndicator(allUnits, player);
         sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
+        if (debug_endRect.height > -1.0f)
+        {
+            DrawRectangle(debug_endRect.x, debug_endRect.y, debug_endRect.width, debug_endRect.height, BLUE);
+        }
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode
         sDrawUI(player, selectedUnit, allUnits, selectedAbility, hoveredTile);
+        DrawRectangle(screenHeight + 20, screenWidth / 2, 64.0, 32.0, WHITE);
         DrawFPS(screenHeight + 20, screenWidth / 2);
 
         EndDrawing();
@@ -180,6 +193,25 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    UnloadTexture(crateTex);
+    UnloadTexture(grassTex);
+    UnloadTexture(fobTex);
+    UnloadTexture(stoneTileTex);
+    UnloadTexture(unitTex);
+    UnloadTexture(HQTex);
+    UnloadTexture(goldmineTex);
+    UnloadTexture(oildrillTex);
+    UnloadTexture(proxsensorTex);
+    UnloadTexture(sandbagTex);
+    UnloadTexture(silvermineTex);
+    UnloadTexture(trenchTex);
+    UnloadTexture(tunnelTex);
+    UnloadTexture(wallTex);
+    UnloadTexture(chevronTex);
+    UnloadTexture(projectileTex);
+    // TODO once sound is added, unload sound
+    // UnloadSound(fxWav); // Unload sound data
+    // CloseAudioDevice(); // Close audio device
     CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 

@@ -15,7 +15,7 @@ void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, A
 void sDrawSelectedUnitIndicator(Unit *&selectedUnit);
 void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility);
 void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile);
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player);
+void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Obstacle> &allObstacles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player);
 void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, Player &player);
 void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player &player);
 void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile);

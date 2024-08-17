@@ -4,23 +4,26 @@
 #include "geometryHelpers.h"
 #include "probabilityHelpers.h"
 #include "gridHelpers.h"
+#include "generalUtils.h"
 #include "raymath.h"
 #include <cmath>
+#include <unordered_set>
 
 void createProjectile(
     std::vector<Projectile> &allProjectiles,
     Texture2D tex,
     Position &originPos,
-    Position &destinationPos,
+    // Position &destinationPos,
+    Rectangle &targetRect,
     std::string &originUnitUuid,
     Teams &team,
-    bool isAerial,
     float &facingAngle,
     float speed,
     bool canCollideBeforeDestination,
     bool causesExplosion,
-    int &effectRadius,
+    int projectileEffectRadius,
     float damage,
     float &accuracy);
 
-void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, float &deltaTime);
+void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, float &deltaTime, Rectangle &debug_endRect);
+void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles);

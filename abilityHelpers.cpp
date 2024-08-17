@@ -224,8 +224,9 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
         case AbilityTypes::RIFLE:
             if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
             {
-                Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
-                Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
+                Position selectedUnitCenter = getRectCenter({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
+                Rectangle targetRect = {hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)};
+                Position hoveredTileCenter = getRectCenter({hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
                 float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, hoveredTileCenter);
 
                 //////////////////////////////////////////////////////////////////////
@@ -400,7 +401,8 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
                 /////////////////////////////////////////////////////////////////////
 
                 // create projectile
-                createProjectile(allProjectiles, projectileTex, selectedUnitCenter, hoveredTileCenter, selectedUnit->uuid, selectedUnit->team, false, angleToRotationTarget, 100.0f, true, false, selectedAbility->effectRadius, selectedAbility->damage, selectedUnit->accuracy);
+                // createProjectile(allProjectiles, projectileTex, selectedUnitCenter, hoveredTileCenter, selectedUnit->uuid, selectedUnit->team, false, angleToRotationTarget, 100.0f, true, false, selectedAbility->effectRadius, selectedAbility->damage, selectedUnit->accuracy);
+                createProjectile(allProjectiles, projectileTex, selectedUnitCenter, targetRect, selectedUnit->uuid, selectedUnit->team, angleToRotationTarget, 100.0f, true, false, 0, selectedAbility->damage, selectedUnit->accuracy);
 
                 useAbility = true;
             }

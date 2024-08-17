@@ -82,9 +82,9 @@ void createUnit(
     if (unitType == UnitType::RIFLEMAN)
     {
         newUnit.attack = 25.0f;
-        newUnit.accuracy = 1.0f;
-        newUnit.maxAp = 10.0f;
-        newUnit.ap = 10.0f;
+        newUnit.accuracy = 50.0f;
+        newUnit.maxAp = 100.0f;
+        newUnit.ap = newUnit.maxAp;
         newUnit.abilities = std::vector<Ability>{moveAbility, rotateAbility, rifleAbility};
 
         newUnit.tex = unitTex;

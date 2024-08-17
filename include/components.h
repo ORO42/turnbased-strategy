@@ -52,6 +52,13 @@ enum struct Stance
     NA
 };
 
+enum struct ProjectileStoppage
+{
+    ALWAYS,
+    SOMETIMES,
+    NEVER,
+};
+
 struct Player
 {
     float ap;
@@ -84,6 +91,14 @@ struct Line
     float endY;
 };
 
+struct PointsRect
+{
+    Position tl;
+    Position tr;
+    Position br;
+    Position bl;
+};
+
 struct IsoscelesTrapezoid
 {
     Position originPos; // center of base
@@ -91,13 +106,6 @@ struct IsoscelesTrapezoid
     Position p2;
     Position p3;
     Position p4;
-};
-
-enum struct ProjectileStoppage
-{
-    ALWAYS,
-    SOMETIMES,
-    NEVER,
 };
 
 struct Ability
@@ -160,6 +168,7 @@ struct Tile
 struct Obstacle
 {
     ObstacleType obstacleType;
+    std::string uuid;
     Position pos;
     Texture2D tex;
     bool isNavigable;
@@ -185,18 +194,21 @@ struct GridSubdivision
 struct Projectile
 {
     Texture2D tex;
-    Position originPos;                     // TODO maybe these need to be rects
-    Position destinationPos = {-1.0, -1.0}; // TODO maybe these need to be rects
+    Position originPos; // TODO maybe these need to be rects
+    // Position destinationPos = {-1.0, -1.0}; // TODO maybe these need to be rects
+    Rectangle targetRect;
     Position currentPos;
+    float facingAngle;
     std::string originUnitUuid;
     Teams team;
-    bool isAerial; // means the projectile doesn't collide with obstacles en route to destination
-    float facingAngle;
     float speed;
-    bool canCollideBeforeDestination; // determined by an initial accuracy roll when creating the projectile
+    bool canCollideBeforeDestination; // determined by an initial accuracy roll, or manually when creating the projectile
     bool shouldDestroy;               // if this projectile needs to be removed
     bool causesExplosion;
     int effectRadius;
     float damage;
     float accuracy; // the chance this projectile causes damage to each unit/obstacle
+    std::vector<std::string> idsToIgnoreInFlight;
+    // Position endPos;                             // the point at which the projectile needs to be destroyed (used to get overlapping obstacles, units, tiles)
+    Rectangle endRect = {-1.0f, -1.0f};
 };

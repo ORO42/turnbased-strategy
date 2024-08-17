@@ -114,7 +114,7 @@ void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&ho
     }
 }
 
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player)
+void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Obstacle> &allObstacles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player)
 {
     for (auto &tile : allTiles)
     {
@@ -136,11 +136,21 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
         }
     }
 
+    for (auto &obstacle : allObstacles)
+    {
+        if (isRectangleInViewport({obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, camera))
+        {
+            DrawTexture(obstacle.tex, obstacle.pos.x, obstacle.pos.y, WHITE);
+        }
+    }
+
     for (auto &projectile : allProjectiles)
     {
-        if (isRectangleInViewport({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, camera))
+        if (isRectangleInViewport({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, camera) && !projectile.shouldDestroy)
         {
             DrawTexture(projectile.tex, projectile.currentPos.x, projectile.currentPos.y, WHITE);
+            // DrawRectangleLines(projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height), PURPLE);
+            // DrawCircle(projectile.currentPos.x, projectile.currentPos.y, 3.0f, RED);
         }
     }
 }
