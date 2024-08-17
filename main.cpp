@@ -54,16 +54,16 @@ int main(void)
     int currentFrame;
     int currentTurn;
     float deltaTime;
-    Unit *selectedUnit = nullptr;
-    Unit *hoveredUnit = nullptr;
-    Tile *hoveredTile = nullptr;
-    Obstacle *hoveredObstacle = nullptr;
-    Ability *selectedAbility = nullptr;
-    std::vector<Unit> allUnits;
-    std::vector<Tile> allTiles;
-    std::vector<Obstacle> allObstacles;
-    std::vector<GridSubdivision> allGridSubdivisions;
-    std::vector<Projectile> allProjectiles;
+    SharedPointer<Unit> selectedUnit = nullptr;
+    SharedPointer<Unit> hoveredUnit = nullptr;
+    SharedPointer<Tile> hoveredTile = nullptr;
+    SharedPointer<Obstacle> hoveredObstacle = nullptr;
+    SharedPointer<Ability> selectedAbility = nullptr;
+    VectorSharedPointer<Unit> allUnits;
+    VectorSharedPointer<Tile> allTiles;
+    VectorSharedPointer<Obstacle> allObstacles;
+    VectorSharedPointer<GridSubdivision> allGridSubdivisions;
+    VectorSharedPointer<Projectile> allProjectiles;
     // std::unordered_map<UnitType, float> unitCreationCostPlayerAp = {{UnitType::ATSOLIDER, 10.0f}, {UnitType::ENGINEER, 15.0f}};
 
     // UI Modes
@@ -101,15 +101,13 @@ int main(void)
     setupRectangularGrid(192, 192, allTiles, grassTex);
     createGridSubdivisions(allGridSubdivisions, allTiles, 192 * 32, 192 * 32, 8, 8);
 
-    Player player = {10.0f, 0.0f};
-    player.ap = 24.0f;
-    player.xp = 0.0f;
-    player.team = Teams::BLUETEAM;
+    SharedPointer<Player> player = std::make_shared<Player>(Player{10.0f, 0.0f});
+    player->ap = 24.0f;
+    player->xp = 0.0f;
+    player->team = Teams::BLUETEAM;
 
     Vector2 screenMousePos;
     Vector2 worldMousePos;
-
-    Rectangle debug_endRect;
 
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
     createUnit(UnitType::RIFLEMAN, {320.0f + 32.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
@@ -145,7 +143,7 @@ int main(void)
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player);
         sMoveUnits(allUnits, deltaTime);
-        sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime, debug_endRect);
+        sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
         sProjectileDamage(allProjectiles, allUnits, allObstacles);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
@@ -174,10 +172,6 @@ int main(void)
         sDrawFacingAngleIndicator(allUnits, player);
         sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
-        if (debug_endRect.height > -1.0f)
-        {
-            DrawRectangle(debug_endRect.x, debug_endRect.y, debug_endRect.width, debug_endRect.height, BLUE);
-        }
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode

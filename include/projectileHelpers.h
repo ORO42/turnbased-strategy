@@ -10,20 +10,20 @@
 #include <unordered_set>
 
 void createProjectile(
-    std::vector<Projectile> &allProjectiles,
+    VectorSharedPointer<Projectile> &allProjectiles,
     Texture2D tex,
-    Position &originPos,
+    Position originPos,
     // Position &destinationPos,
-    Rectangle &targetRect,
-    std::string &originUnitUuid,
-    Teams &team,
-    float &facingAngle,
+    Rectangle targetRect,
+    std::string originUnitUuid,
+    Teams team,
+    float facingAngle,
     float speed,
     bool canCollideBeforeDestination,
     bool causesExplosion,
     int projectileEffectRadius,
     float damage,
-    float &accuracy);
-
-void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, float &deltaTime, Rectangle &debug_endRect);
-void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles);
+    float accuracy);
+;
+void sMoveProjectiles(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, float deltaTime);
+void sProjectileDamage(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles);

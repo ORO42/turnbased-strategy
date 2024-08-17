@@ -17,11 +17,11 @@ bool isRectangleInViewport(const Rectangle &rect, const Camera2D &camera)
     return true;
 }
 
-void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, Ability *&selectedAbility, Tile *&hoveredTile)
+void sDrawUI(SharedPointer<Player> &player, SharedPointer<Unit> &selectedUnit, VectorSharedPointer<Unit> &allUnits, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile)
 {
     // draw player stats
-    DrawText(TextFormat("AP: %.2f", player.ap), 10, 10, 16, WHITE);
-    DrawText(TextFormat("XP: %.2f", player.xp), 10, 30, 16, WHITE);
+    DrawText(TextFormat("AP: %.2f", player->ap), 10, 10, 16, WHITE);
+    DrawText(TextFormat("XP: %.2f", player->xp), 10, 30, 16, WHITE);
 
     // draw unit stats
     if (selectedUnit)
@@ -54,19 +54,19 @@ void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, A
         for (auto &ability : selectedUnit->abilities)
         {
             auto color = WHITE;
-            if (selectedAbility && selectedAbility->uuid == ability.uuid)
+            if (selectedAbility && selectedAbility->uuid == ability->uuid)
             {
                 color = RED;
             }
-            if (ability.unitApCost > selectedUnit->ap)
+            if (ability->unitApCost > selectedUnit->ap)
             {
                 color = LIGHTGRAY;
             }
-            if (ability.useQty && ability.qty == 0)
+            if (ability->useQty && ability->qty == 0)
             {
                 color = LIGHTGRAY;
             }
-            const char *cstr = ability.displayTitle.c_str();
+            const char *cstr = ability->displayTitle.c_str();
             if (abilityIdx < 10)
             {
                 DrawText(TextFormat("%d", abilityIdx + 1), 10, 100 + (abilityIdx * 20), 16, color);
@@ -89,7 +89,7 @@ void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, A
     }
 }
 
-void sDrawSelectedUnitIndicator(Unit *&selectedUnit)
+void sDrawSelectedUnitIndicator(SharedPointer<Unit> &selectedUnit)
 {
     if (selectedUnit)
     {
@@ -97,7 +97,7 @@ void sDrawSelectedUnitIndicator(Unit *&selectedUnit)
     }
 }
 
-void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility)
+void sDrawHoveredTileIndicator(SharedPointer<Tile> &hoveredTile, SharedPointer<Ability> &selectedAbility)
 {
     if (!selectedAbility && hoveredTile)
     {
@@ -105,7 +105,7 @@ void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility)
     }
 }
 
-void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile)
+void sDrawEffectRadius(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile)
 {
     if (selectedAbility && selectedUnit && hoveredTile)
     {
@@ -114,13 +114,13 @@ void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&ho
     }
 }
 
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Obstacle> &allObstacles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player)
+void sDrawAllTextures(VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Tile> &allTiles, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Projectile> &allProjectiles, Camera2D &camera, SharedPointer<Player> &player)
 {
     for (auto &tile : allTiles)
     {
-        if (isRectangleInViewport({tile.pos.x, tile.pos.y, 32.0f, 32.0f}, camera))
+        if (isRectangleInViewport({tile->pos.x, tile->pos.y, 32.0f, 32.0f}, camera))
         {
-            DrawTexture(tile.tex, tile.pos.x, tile.pos.y, WHITE);
+            DrawTexture(tile->tex, tile->pos.x, tile->pos.y, WHITE);
             // DrawText(TextFormat("%.3f", tile.perlinNoise), tile.pos.x, tile.pos.y, 6, WHITE);
         }
     }
@@ -129,59 +129,59 @@ void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, 
     {
         if (shouldRenderUnitDueToVisibility(unit, player))
         {
-            if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
+            if (isRectangleInViewport({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}, camera))
             {
-                DrawTexture(unit.tex, unit.pos.x, unit.pos.y, WHITE);
+                DrawTexture(unit->tex, unit->pos.x, unit->pos.y, WHITE);
             }
         }
     }
 
     for (auto &obstacle : allObstacles)
     {
-        if (isRectangleInViewport({obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, camera))
+        if (isRectangleInViewport({obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)}, camera))
         {
-            DrawTexture(obstacle.tex, obstacle.pos.x, obstacle.pos.y, WHITE);
+            DrawTexture(obstacle->tex, obstacle->pos.x, obstacle->pos.y, WHITE);
         }
     }
 
     for (auto &projectile : allProjectiles)
     {
-        if (isRectangleInViewport({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, camera) && !projectile.shouldDestroy)
+        if (isRectangleInViewport({projectile->currentPos.x, projectile->currentPos.y, static_cast<float>(projectile->tex.width), static_cast<float>(projectile->tex.height)}, camera) && !projectile->shouldDestroy)
         {
-            DrawTexture(projectile.tex, projectile.currentPos.x, projectile.currentPos.y, WHITE);
+            DrawTexture(projectile->tex, projectile->currentPos.x, projectile->currentPos.y, WHITE);
             // DrawRectangleLines(projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height), PURPLE);
             // DrawCircle(projectile.currentPos.x, projectile.currentPos.y, 3.0f, RED);
         }
     }
 }
 
-void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, Player &player)
+void sDrawRotationChevron(VectorSharedPointer<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, SharedPointer<Player> &player)
 {
     for (auto &unit : allUnits)
     {
-        if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
+        if (isRectangleInViewport({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}, camera))
         {
             if (shouldRenderUnitDueToVisibility(unit, player))
             {
-                DrawTextureEx(chevronTex, {unit.pos.x, unit.pos.y}, 90.0f + 45.0f, 1.0f, WHITE);
+                DrawTextureEx(chevronTex, {unit->pos.x, unit->pos.y}, 90.0f + 45.0f, 1.0f, WHITE);
             }
         }
     }
 }
 
-void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player &player)
+void sDrawVisionTrapezoids(VectorSharedPointer<Unit> &allUnits, Camera2D &camera, SharedPointer<Player> &player)
 {
     for (auto &unit : allUnits)
     {
-        if (isRectangleInViewport({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, camera))
+        if (isRectangleInViewport({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}, camera))
         {
             if (shouldRenderUnitDueToVisibility(unit, player))
             {
-                Position originPos = unit.visionTrapezoid.originPos;
-                Position p1 = unit.visionTrapezoid.p1;
-                Position p2 = unit.visionTrapezoid.p2;
-                Position p3 = unit.visionTrapezoid.p3;
-                Position p4 = unit.visionTrapezoid.p4;
+                Position originPos = unit->visionTrapezoid.originPos;
+                Position p1 = unit->visionTrapezoid.p1;
+                Position p2 = unit->visionTrapezoid.p2;
+                Position p3 = unit->visionTrapezoid.p3;
+                Position p4 = unit->visionTrapezoid.p4;
                 // DrawText(TextFormat("%s", "oP"), originPos.x, originPos.y, 16, RED);
                 DrawLineV({p1.x, p1.y}, {p2.x, p2.y}, ORANGE);
                 // DrawText(TextFormat("%s", "p1"), p1.x, p1.y, 16, RED);
@@ -196,7 +196,7 @@ void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player
     }
 }
 
-void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile)
+void DEBUGsDrawAngleToHoveredTile(SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile)
 {
     if (selectedUnit && hoveredTile)
     {
@@ -208,14 +208,14 @@ void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile)
     }
 }
 
-void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player)
+void sDrawFacingAngleIndicator(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player)
 {
     for (auto &unit : allUnits)
     {
         if (shouldRenderUnitDueToVisibility(unit, player))
         {
-            Position unitCenter = getRectCenter({unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)});
-            float unitFacingAngle = unit.facingAngle;
+            Position unitCenter = getRectCenter({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)});
+            float unitFacingAngle = unit->facingAngle;
             float lineLength = 64.0f;
 
             // Convert angle to radians
@@ -231,7 +231,7 @@ void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player)
     }
 }
 
-void sDrawDistanceIndicators(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile, std::vector<Obstacle> &allObstacles, std::vector<Unit> &allUnits, Vector2 &worldMousePos)
+void sDrawDistanceIndicators(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos)
 {
     if (selectedAbility && selectedUnit && selectedAbility->reachRadius > -1)
     {
@@ -250,7 +250,7 @@ void sDrawDistanceIndicators(Ability *&selectedAbility, Unit *&selectedUnit, Til
     }
 }
 
-void sDrawReachRadiusRect(Ability *&selectedAbility, Unit *&selectedUnit)
+void sDrawReachRadiusRect(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit)
 {
     if (selectedAbility && selectedAbility->reachRadius > 0)
     {

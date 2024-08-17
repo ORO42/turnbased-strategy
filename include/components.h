@@ -6,6 +6,13 @@
 #include "raylib.h"
 #include <vector>
 #include <string>
+#include <memory>
+
+template <typename T>
+using SharedPointer = std::shared_ptr<T>;
+
+template <typename T>
+using VectorSharedPointer = std::vector<std::shared_ptr<T>>;
 
 enum struct AbilityTypes
 {
@@ -146,7 +153,7 @@ struct Unit
     int viewDistance;
     int viewWidth;
 
-    std::vector<Ability> abilities;
+    VectorSharedPointer<Ability> abilities;
 
     int turnsAliveCt;
     Texture2D tex;
@@ -185,7 +192,7 @@ struct GridSubdivision
     Position pos;
     float w;
     float h;
-    std::vector<Tile> tilesInSubdivision; // TODO this needs to be a vector of pointers to references
+    VectorSharedPointer<Tile> tilesInSubdivision; // TODO this needs to be a vector of pointers to references
     // after creating all tiles, create quads
     // for each quad, push_back a reference to all tiles intersecting the quad into the quad
     // to check tile collisions externally, get all the quads that are colliding, and iterate each quad's contained tiles

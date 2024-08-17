@@ -11,14 +11,14 @@
 #include "obstacleHelpers.h"
 
 bool isRectangleInViewport(const Rectangle &rect, const Camera2D &camera);
-void sDrawUI(Player &player, Unit *&selectedUnit, std::vector<Unit> &allUnits, Ability *&selectedAbility, Tile *&hoveredTile);
-void sDrawSelectedUnitIndicator(Unit *&selectedUnit);
-void sDrawHoveredTileIndicator(Tile *&hoveredTile, Ability *&selectedAbility);
-void sDrawEffectRadius(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile);
-void sDrawAllTextures(std::vector<Unit> &allUnits, std::vector<Tile> &allTiles, std::vector<Obstacle> &allObstacles, std::vector<Projectile> &allProjectiles, Camera2D &camera, Player &player);
-void sDrawRotationChevron(std::vector<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, Player &player);
-void sDrawVisionTrapezoids(std::vector<Unit> &allUnits, Camera2D &camera, Player &player);
-void DEBUGsDrawAngleToHoveredTile(Unit *&selectedUnit, Tile *&hoveredTile);
-void sDrawFacingAngleIndicator(std::vector<Unit> &allUnits, Player &player);
-void sDrawDistanceIndicators(Ability *&selectedAbility, Unit *&selectedUnit, Tile *&hoveredTile, std::vector<Obstacle> &allObstacles, std::vector<Unit> &allUnits, Vector2 &worldMousePos);
-void sDrawReachRadiusRect(Ability *&selectedAbility, Unit *&selectedUnit);
+void sDrawUI(SharedPointer<Player> &player, SharedPointer<Unit> &selectedUnit, VectorSharedPointer<Unit> &allUnits, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile);
+void sDrawSelectedUnitIndicator(SharedPointer<Unit> &selectedUnit);
+void sDrawHoveredTileIndicator(SharedPointer<Tile> &hoveredTile, SharedPointer<Ability> &selectedAbility);
+void sDrawEffectRadius(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile);
+void sDrawAllTextures(VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Tile> &allTiles, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Projectile> &allProjectiles, Camera2D &camera, SharedPointer<Player> &player);
+void sDrawRotationChevron(VectorSharedPointer<Unit> &allUnits, Camera2D &camera, Texture2D &chevronTex, SharedPointer<Player> &player);
+void sDrawVisionTrapezoids(VectorSharedPointer<Unit> &allUnits, Camera2D &camera, SharedPointer<Player> &player);
+void DEBUGsDrawAngleToHoveredTile(SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile);
+void sDrawFacingAngleIndicator(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player);
+void sDrawDistanceIndicators(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos);
+void sDrawReachRadiusRect(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit);

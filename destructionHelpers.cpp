@@ -1,51 +1,55 @@
 #include "include/destructionHelpers.h"
 
-void sDestroyUnits(std::vector<Unit> &allUnits, Unit *&selectedUnit, Ability *&selectedAbility)
+void sDestroyUnits(VectorSharedPointer<Unit> &allUnits, SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility)
 {
-    allUnits.erase(std::remove_if(allUnits.begin(), allUnits.end(), [&](Unit &unit)
+    allUnits.erase(std::remove_if(allUnits.begin(), allUnits.end(), [&](const SharedPointer<Unit> &unitPtr)
                                   {
-                                      if (unit.health <= 0.0)
+                                      if (unitPtr->health <= 0.0)
                                       {
-                                          for (auto &ability : unit.abilities)
+                                          // Check if any of the unit's abilities match the selected ability
+                                          for (const auto &ability : unitPtr->abilities)
                                           {
-                                              if (selectedAbility && ability.uuid == selectedAbility->uuid)
+                                              if (selectedAbility && ability->uuid == selectedAbility->uuid)
                                               {
                                                   selectedAbility = nullptr;
                                               }
                                           }
-                                          if (selectedUnit && selectedUnit->uuid == unit.uuid)
+
+                                          // Check if the selected unit matches the unit to be removed
+                                          if (selectedUnit && selectedUnit->uuid == unitPtr->uuid)
                                           {
                                               selectedUnit = nullptr;
                                           }
-                                          return true; // should remove
+
+                                          return true; // Remove this unit
                                       }
                                       return false; // Keep this unit
                                   }),
                    allUnits.end());
 }
 
-void sDestroyObstacles(std::vector<Obstacle> &allObstacles)
+void sDestroyObstacles(VectorSharedPointer<Obstacle> &allObstacles)
 {
-    allObstacles.erase(std::remove_if(allObstacles.begin(), allObstacles.end(), [&](Obstacle &obsacle)
+    allObstacles.erase(std::remove_if(allObstacles.begin(), allObstacles.end(), [](const SharedPointer<Obstacle> &obsaclePtr)
                                       {
-                                          if (obsacle.health <= 0.0)
+                                          if (obsaclePtr->health <= 0.0)
                                           {
-                                              return true; // should remove
+                                              return true; // Remove this obstacle
                                           }
-                                          return false; // Keep this unit
+                                          return false; // Keep this obstacle
                                       }),
                        allObstacles.end());
 }
 
-void sDestroyProjectiles(std::vector<Projectile> &allProjectiles)
+void sDestroyProjectiles(VectorSharedPointer<Projectile> &allProjectiles)
 {
-    allProjectiles.erase(std::remove_if(allProjectiles.begin(), allProjectiles.end(), [&](Projectile &projectile)
+    allProjectiles.erase(std::remove_if(allProjectiles.begin(), allProjectiles.end(), [](const SharedPointer<Projectile> &projectilePtr)
                                         {
-                                            if (projectile.shouldDestroy)
+                                            if (projectilePtr->shouldDestroy)
                                             {
-                                                return true; // should remove
+                                                return true; // Remove this projectile
                                             }
-                                            return false; // Keep this unit
+                                            return false; // Keep this projectile
                                         }),
                          allProjectiles.end());
 }

@@ -1,90 +1,87 @@
 #include "include/projectileHelpers.h"
 
 void createProjectile(
-    std::vector<Projectile> &allProjectiles,
+    VectorSharedPointer<Projectile> &allProjectiles,
     Texture2D tex,
-    Position &originPos,
+    Position originPos,
     // Position &destinationPos,
-    Rectangle &targetRect,
-    std::string &originUnitUuid,
-    Teams &team,
-    float &facingAngle,
+    Rectangle targetRect,
+    std::string originUnitUuid,
+    Teams team,
+    float facingAngle,
     float speed,
     bool canCollideBeforeDestination,
     bool causesExplosion,
     int projectileEffectRadius,
     float damage,
-    float &accuracy)
+    float accuracy)
 {
-    Projectile newProjectile;
-    newProjectile.tex = tex;
-    newProjectile.originPos = originPos;
+    SharedPointer<Projectile> newProjectile = std::make_shared<Projectile>();
+    newProjectile->tex = tex;
+    newProjectile->originPos = originPos;
     // newProjectile.destinationPos = destinationPos;
-    newProjectile.targetRect = targetRect;
-    newProjectile.currentPos = originPos;
-    newProjectile.originUnitUuid = originUnitUuid;
-    newProjectile.team = team;
-    newProjectile.facingAngle = facingAngle;
-    newProjectile.speed = speed;
-    newProjectile.canCollideBeforeDestination = canCollideBeforeDestination;
-    newProjectile.shouldDestroy = false;
-    newProjectile.causesExplosion = causesExplosion;
-    newProjectile.effectRadius = projectileEffectRadius;
-    newProjectile.damage = damage;
-    newProjectile.accuracy = accuracy;
+    newProjectile->targetRect = targetRect;
+    newProjectile->currentPos = originPos;
+    newProjectile->originUnitUuid = originUnitUuid;
+    newProjectile->team = team;
+    newProjectile->facingAngle = facingAngle;
+    newProjectile->speed = speed;
+    newProjectile->canCollideBeforeDestination = canCollideBeforeDestination;
+    newProjectile->shouldDestroy = false;
+    newProjectile->causesExplosion = causesExplosion;
+    newProjectile->effectRadius = projectileEffectRadius;
+    newProjectile->damage = damage;
+    newProjectile->accuracy = accuracy;
 
     allProjectiles.push_back(newProjectile);
 }
 
-void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, float &deltaTime, Rectangle &debug_endRect)
+void sMoveProjectiles(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, float deltaTime)
 {
     for (auto &projectile : allProjectiles)
     {
-        if (!projectile.shouldDestroy)
+        if (!projectile->shouldDestroy)
         {
             // Calculate movement in the x and y directions based on the angle
-            float moveStep = projectile.speed * deltaTime;
-            float angleInRadians = projectile.facingAngle * (PI / 180.0f);
+            float moveStep = projectile->speed * deltaTime;
+            float angleInRadians = projectile->facingAngle * (PI / 180.0f);
             float moveX = moveStep * std::cos(angleInRadians);
             float moveY = moveStep * std::sin(angleInRadians);
 
-            if (CheckCollisionRecs({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, projectile.targetRect))
+            if (CheckCollisionRecs({projectile->currentPos.x, projectile->currentPos.y, static_cast<float>(projectile->tex.width), static_cast<float>(projectile->tex.height)}, projectile->targetRect))
             {
-                projectile.endRect = projectile.targetRect;
-                debug_endRect = projectile.endRect;
-                projectile.shouldDestroy = true;
+                projectile->endRect = projectile->targetRect;
+                projectile->shouldDestroy = true;
             }
 
             for (auto &unit : allUnits)
             {
-                if (projectile.originUnitUuid != unit.uuid)
+                if (projectile->originUnitUuid != unit->uuid)
                 {
-                    if (CheckCollisionRecs({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+                    if (CheckCollisionRecs({projectile->currentPos.x, projectile->currentPos.y, static_cast<float>(projectile->tex.width), static_cast<float>(projectile->tex.height)}, {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}))
                     {
-                        if (unit.projectileStoppage == ProjectileStoppage::ALWAYS)
+                        if (unit->projectileStoppage == ProjectileStoppage::ALWAYS)
                         {
-                            if (projectile.canCollideBeforeDestination)
+                            if (projectile->canCollideBeforeDestination)
                             {
-                                projectile.endRect = {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)};
-                                debug_endRect = projectile.endRect;
-                                projectile.shouldDestroy = true;
+                                projectile->endRect = {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)};
+                                projectile->shouldDestroy = true;
                             }
                         }
-                        if (unit.projectileStoppage == ProjectileStoppage::SOMETIMES)
+                        if (unit->projectileStoppage == ProjectileStoppage::SOMETIMES)
                         {
-                            if (projectile.canCollideBeforeDestination)
+                            if (projectile->canCollideBeforeDestination)
                             {
-                                if (!doesVectorContainString(projectile.idsToIgnoreInFlight, unit.uuid))
+                                if (!doesVectorContainString(projectile->idsToIgnoreInFlight, unit->uuid))
                                 {
-                                    if (!calculateChance(projectile.accuracy))
+                                    if (!calculateChance(projectile->accuracy))
                                     {
-                                        projectile.endRect = {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)};
-                                        debug_endRect = projectile.endRect;
-                                        projectile.shouldDestroy = true;
+                                        projectile->endRect = {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)};
+                                        projectile->shouldDestroy = true;
                                     }
                                     else
                                     {
-                                        projectile.idsToIgnoreInFlight.push_back(unit.uuid);
+                                        projectile->idsToIgnoreInFlight.push_back(unit->uuid);
                                     }
                                 }
                             }
@@ -95,34 +92,32 @@ void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit>
 
             for (auto &obstacle : allObstacles)
             {
-                if (projectile.originUnitUuid != obstacle.uuid)
+                if (projectile->originUnitUuid != obstacle->uuid)
                 {
-                    if (CheckCollisionRecs({projectile.currentPos.x, projectile.currentPos.y, static_cast<float>(projectile.tex.width), static_cast<float>(projectile.tex.height)}, {obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}))
+                    if (CheckCollisionRecs({projectile->currentPos.x, projectile->currentPos.y, static_cast<float>(projectile->tex.width), static_cast<float>(projectile->tex.height)}, {obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)}))
                     {
-                        if (obstacle.projectileStoppage == ProjectileStoppage::ALWAYS)
+                        if (obstacle->projectileStoppage == ProjectileStoppage::ALWAYS)
                         {
-                            if (projectile.canCollideBeforeDestination)
+                            if (projectile->canCollideBeforeDestination)
                             {
-                                projectile.endRect = {obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)};
-                                debug_endRect = projectile.endRect;
-                                projectile.shouldDestroy = true;
+                                projectile->endRect = {obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)};
+                                projectile->shouldDestroy = true;
                             }
                         }
-                        if (obstacle.projectileStoppage == ProjectileStoppage::SOMETIMES)
+                        if (obstacle->projectileStoppage == ProjectileStoppage::SOMETIMES)
                         {
-                            if (projectile.canCollideBeforeDestination)
+                            if (projectile->canCollideBeforeDestination)
                             {
-                                if (!doesVectorContainString(projectile.idsToIgnoreInFlight, obstacle.uuid))
+                                if (!doesVectorContainString(projectile->idsToIgnoreInFlight, obstacle->uuid))
                                 {
-                                    if (!calculateChance(projectile.accuracy))
+                                    if (!calculateChance(projectile->accuracy))
                                     {
-                                        projectile.endRect = {obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)};
-                                        debug_endRect = projectile.endRect;
-                                        projectile.shouldDestroy = true;
+                                        projectile->endRect = {obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)};
+                                        projectile->shouldDestroy = true;
                                     }
                                     else
                                     {
-                                        projectile.idsToIgnoreInFlight.push_back(obstacle.uuid);
+                                        projectile->idsToIgnoreInFlight.push_back(obstacle->uuid);
                                     }
                                 }
                             }
@@ -131,10 +126,10 @@ void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit>
                 }
             }
 
-            if (!projectile.shouldDestroy)
+            if (!projectile->shouldDestroy)
             {
-                projectile.currentPos.x += moveX;
-                projectile.currentPos.y += moveY;
+                projectile->currentPos.x += moveX;
+                projectile->currentPos.y += moveY;
             }
 
             // TODO handle non colliding mode projectiles
@@ -267,64 +262,64 @@ void sMoveProjectiles(std::vector<Projectile> &allProjectiles, std::vector<Unit>
 //     }
 // }
 
-void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles)
+void sProjectileDamage(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles)
 {
     for (auto &projectile : allProjectiles)
     {
-        if (projectile.shouldDestroy)
+        if (projectile->shouldDestroy)
         {
-            Rectangle endRect = projectile.endRect;
-            Rectangle effectRadiusRect = createRectAroundRect(endRect, projectile.effectRadius);
-            Unit *unitInCenter = nullptr;
-            Obstacle *obstacleInCenter = nullptr;
+            Rectangle endRect = projectile->endRect;
+            Rectangle effectRadiusRect = createRectAroundRect(endRect, projectile->effectRadius);
+            SharedPointer<Unit> unitInCenter = nullptr;
+            SharedPointer<Obstacle> obstacleInCenter = nullptr;
 
-            std::vector<Unit *> unitsInEffectRect;
-            std::vector<Obstacle *> obstaclesInEffectRect;
+            VectorSharedPointer<Unit> unitsInEffectRect;
+            VectorSharedPointer<Obstacle> obstaclesInEffectRect;
 
             bool continueDueToImpassableCenter = false;
 
             for (auto &unit : allUnits)
             {
-                Rectangle unitRect = {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)};
+                Rectangle unitRect = {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)};
                 if (CheckCollisionRecs(unitRect, endRect))
                 {
-                    unitInCenter = &unit;
+                    unitInCenter = unit;
                 }
                 if (CheckCollisionRecs(unitRect, effectRadiusRect))
                 {
-                    unitsInEffectRect.push_back(&unit);
+                    unitsInEffectRect.push_back(unit);
                 }
             }
 
             for (auto &obstacle : allObstacles)
             {
-                Rectangle obstacleRect = {obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)};
+                Rectangle obstacleRect = {obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)};
                 if (CheckCollisionRecs(obstacleRect, endRect))
                 {
-                    obstacleInCenter = &obstacle;
+                    obstacleInCenter = obstacle;
                 }
                 if (CheckCollisionRecs(obstacleRect, effectRadiusRect))
                 {
-                    obstaclesInEffectRect.push_back(&obstacle);
+                    obstaclesInEffectRect.push_back(obstacle);
                 }
             }
 
-            if (projectile.effectRadius == 0 && !unitInCenter && !obstacleInCenter)
+            if (projectile->effectRadius == 0 && !unitInCenter && !obstacleInCenter)
             {
                 continue;
             }
 
             bool shouldContinue = false;
-            if (projectile.effectRadius == 0 && unitInCenter)
+            if (projectile->effectRadius == 0 && unitInCenter)
             {
                 std::cout << "reached" << std::endl;
-                unitInCenter->health -= projectile.damage;
+                unitInCenter->health -= projectile->damage;
                 shouldContinue = true;
             }
 
-            if (projectile.effectRadius == 0 && obstacleInCenter)
+            if (projectile->effectRadius == 0 && obstacleInCenter)
             {
-                obstacleInCenter->health -= projectile.damage;
+                obstacleInCenter->health -= projectile->damage;
                 shouldContinue = true;
             }
 
@@ -335,14 +330,14 @@ void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit
 
             if (unitInCenter)
             {
-                unitInCenter->health -= projectile.damage;
+                unitInCenter->health -= projectile->damage;
                 if (unitInCenter->projectileStoppage == ProjectileStoppage::ALWAYS)
                 {
                     continueDueToImpassableCenter = true;
                 }
                 if (unitInCenter->projectileStoppage == ProjectileStoppage::SOMETIMES)
                 {
-                    if (!calculateChance(projectile.accuracy))
+                    if (!calculateChance(projectile->accuracy))
                     {
                         continueDueToImpassableCenter = true;
                     }
@@ -355,14 +350,14 @@ void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit
 
             if (obstacleInCenter)
             {
-                obstacleInCenter->health -= projectile.damage;
+                obstacleInCenter->health -= projectile->damage;
                 if (obstacleInCenter->projectileStoppage == ProjectileStoppage::ALWAYS)
                 {
                     continueDueToImpassableCenter = true;
                 }
                 if (obstacleInCenter->projectileStoppage == ProjectileStoppage::SOMETIMES)
                 {
-                    if (!calculateChance(projectile.accuracy))
+                    if (!calculateChance(projectile->accuracy))
                     {
                         continueDueToImpassableCenter = true;
                     }
@@ -374,15 +369,15 @@ void sProjectileDamage(std::vector<Projectile> &allProjectiles, std::vector<Unit
             }
 
             // if made it to this point, means all directly adjacent items can be damaged
-            if (projectile.effectRadius == 1)
+            if (projectile->effectRadius == 1)
             {
                 for (auto &unit : unitsInEffectRect)
                 {
-                    unit->health -= projectile.damage;
+                    unit->health -= projectile->damage;
                 }
                 for (auto &obstacle : obstaclesInEffectRect)
                 {
-                    obstacle->health -= projectile.damage;
+                    obstacle->health -= projectile->damage;
                 }
                 continue;
             }

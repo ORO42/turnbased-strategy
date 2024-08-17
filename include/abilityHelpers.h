@@ -12,6 +12,6 @@
 #include <algorithm>
 #include <random>
 
-void sSelectAbility(Unit *&selectedUnit, Ability *&selectedAbility, Vector2 &worldMousePos);
-void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile, Unit *&hoveredUnit, Obstacle *&hoveredObstacle, Player &player, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, Vector2 &worldMousePos, std::vector<GridSubdivision> &allGridSubdivisions, std::vector<Projectile> &allProjectiles, Texture2D projectileTex);
-void sAutoDeselectAbility(Unit *&selectedUnit, Ability *&selectedAbility);
+void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, Vector2 &worldMousePos);
+void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex);
+void sAutoDeselectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility);

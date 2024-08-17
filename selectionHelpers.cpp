@@ -1,11 +1,11 @@
 #include "include/selectionHelpers.h"
 
-Unit getUnitById(std::string uuid, std::vector<Unit> &allUnits)
+SharedPointer<Unit> getUnitById(std::string uuid, VectorSharedPointer<Unit> &allUnits)
 {
-    Unit returnUnit = {};
+    SharedPointer<Unit> returnUnit = nullptr;
     for (auto &unit : allUnits)
     {
-        if (unit.uuid == uuid)
+        if (unit->uuid == uuid)
         {
             returnUnit = unit;
         }
@@ -21,7 +21,7 @@ Unit getUnitById(std::string uuid, std::vector<Unit> &allUnits)
 // {
 // }
 
-void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Unit> &allUnits, Vector2 &worldMousePos, Player &player)
+void sSelectUnit(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos, SharedPointer<Player> &player)
 {
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
@@ -29,12 +29,12 @@ void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Uni
 
         for (auto &unit : allUnits)
         {
-            if (shouldRenderUnitDueToVisibility(unit, player) && unit.team == player.team)
+            if (shouldRenderUnitDueToVisibility(unit, player) && unit->team == player->team)
             {
-                if (CheckCollisionPointRec(worldMousePos, {unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+                if (CheckCollisionPointRec(worldMousePos, {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}))
                 {
                     // TODO only can select units that belong to your team
-                    selectedUnit = &unit;
+                    selectedUnit = unit;
                     if (selectedUnit->team == Teams::BLUETEAM)
                     {
                         std::cout << "BLUETEAM" << std::endl;
@@ -50,7 +50,7 @@ void sSelectUnit(Unit *&selectedUnit, Ability *&selectedAbility, std::vector<Uni
     }
 }
 
-void sClearStates(Unit *&selectedUnit, Ability *&selectedAbility)
+void sClearStates(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility)
 {
     if (IsKeyPressed(KEY_C))
     {

@@ -1,56 +1,35 @@
 #include "include/abilityHelpers.h"
 
-void sSelectAbility(Unit *&selectedUnit, Ability *&selectedAbility, Vector2 &worldMousePos)
+void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, Vector2 &worldMousePos)
 {
     static int currentAbilityIdx = -1; // Holds the index of the currently selected ability
     int requestedAbilityIdx = -1;
 
     if (selectedUnit)
     {
+        // Handle key inputs for ability selection
         if (IsKeyPressed(KEY_ONE))
-        {
             requestedAbilityIdx = 0;
-        }
         else if (IsKeyPressed(KEY_TWO))
-        {
             requestedAbilityIdx = 1;
-        }
         else if (IsKeyPressed(KEY_THREE))
-        {
             requestedAbilityIdx = 2;
-        }
         else if (IsKeyPressed(KEY_FOUR))
-        {
             requestedAbilityIdx = 3;
-        }
         else if (IsKeyPressed(KEY_FIVE))
-        {
             requestedAbilityIdx = 4;
-        }
         else if (IsKeyPressed(KEY_SIX))
-        {
             requestedAbilityIdx = 5;
-        }
         else if (IsKeyPressed(KEY_SEVEN))
-        {
             requestedAbilityIdx = 6;
-        }
         else if (IsKeyPressed(KEY_EIGHT))
-        {
             requestedAbilityIdx = 7;
-        }
         else if (IsKeyPressed(KEY_NINE))
-        {
             requestedAbilityIdx = 8;
-        }
         else if (IsKeyDown(KEY_ONE) && IsKeyDown(KEY_LEFT_SHIFT))
-        {
             requestedAbilityIdx = 9;
-        }
         else if (IsKeyDown(KEY_TWO) && IsKeyDown(KEY_LEFT_SHIFT))
-        {
             requestedAbilityIdx = 10;
-        }
     }
     else
     {
@@ -63,15 +42,15 @@ void sSelectAbility(Unit *&selectedUnit, Ability *&selectedAbility, Vector2 &wor
     {
         if (requestedAbilityIdx == currentAbilityIdx)
         {
-            selectedAbility = nullptr;
+            selectedAbility = nullptr; // Deselect the current ability
             currentAbilityIdx = -1;
         }
         else
         {
-            Ability &ability = selectedUnit->abilities[requestedAbilityIdx];
-            if (selectedUnit->ap >= ability.unitApCost && selectedUnit->xp >= ability.unitXpRequirement)
+            SharedPointer<Ability> ability = selectedUnit->abilities[requestedAbilityIdx]; // Use shared_ptr to access the ability
+            if (selectedUnit->ap >= ability->unitApCost && selectedUnit->xp >= ability->unitXpRequirement)
             {
-                selectedAbility = &ability;
+                selectedAbility = ability; // Assign the shared_ptr
                 currentAbilityIdx = requestedAbilityIdx;
             }
         }
@@ -187,10 +166,10 @@ void sSelectAbility(Unit *&selectedUnit, Ability *&selectedAbility, Vector2 &wor
 //     }
 // }
 
-void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredTile, Unit *&hoveredUnit, Obstacle *&hoveredObstacle, Player &player, std::vector<Unit> &allUnits, std::vector<Obstacle> &allObstacles, Vector2 &worldMousePos, std::vector<GridSubdivision> &allGridSubdivisions, std::vector<Projectile> &allProjectiles, Texture2D projectileTex)
+void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex)
 {
-    std::vector<Unit *> unitsToAffect = {};
-    std::vector<Obstacle *> obstaclesToAffect = {};
+    VectorSharedPointer<Unit> unitsToAffect = {};
+    VectorSharedPointer<Obstacle> obstaclesToAffect = {};
     bool useAbility = false;
 
     if (selectedAbility && selectedUnit) // means it's a unit ability
@@ -417,14 +396,14 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
                 // establish effect radius
                 Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
                 // get tiles in effectRadiusRect
-                std::vector<Tile> tilesInEffectRadius;
+                VectorSharedPointer<Tile> tilesInEffectRadius;
                 for (auto &gsubdiv : allGridSubdivisions)
                 {
-                    if (CheckCollisionRecs(effectRadiusRect, {gsubdiv.pos.x, gsubdiv.pos.y, gsubdiv.w, gsubdiv.w}))
+                    if (CheckCollisionRecs(effectRadiusRect, {gsubdiv->pos.x, gsubdiv->pos.y, gsubdiv->w, gsubdiv->w}))
                     {
-                        for (auto &tile : gsubdiv.tilesInSubdivision)
+                        for (auto &tile : gsubdiv->tilesInSubdivision)
                         {
-                            if (CheckCollisionRecs(effectRadiusRect, {tile.pos.x, tile.pos.y, static_cast<float>(tile.tex.width), static_cast<float>(tile.tex.height)}))
+                            if (CheckCollisionRecs(effectRadiusRect, {tile->pos.x, tile->pos.y, static_cast<float>(tile->tex.width), static_cast<float>(tile->tex.height)}))
                             {
                                 tilesInEffectRadius.push_back(tile);
                             }
@@ -438,11 +417,11 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
                 // shuffle the vector
                 std::shuffle(tilesInEffectRadius.begin(), tilesInEffectRadius.end(), g);
                 // select first 3 tiles from shuffled tilesInEffectRadius
-                std::vector<Tile> chosenTiles(tilesInEffectRadius.begin(), tilesInEffectRadius.begin() + 3);
+                VectorSharedPointer<Tile> chosenTiles(tilesInEffectRadius.begin(), tilesInEffectRadius.begin() + 3);
                 for (auto &tile : chosenTiles)
                 {
                     // create projectiles
-                    Position tileCenter = getRectCenter({tile.pos.x, tile.pos.y, static_cast<float>(tile.tex.width), static_cast<float>(tile.tex.height)});
+                    Position tileCenter = getRectCenter({tile->pos.x, tile->pos.y, static_cast<float>(tile->tex.width), static_cast<float>(tile->tex.height)});
                     float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, tileCenter);
                     // TODO invoke create projectile function
                 }
@@ -460,11 +439,11 @@ void sUseAbility(Unit *&selectedUnit, Ability *&selectedAbility, Tile *&hoveredT
     {
         useAbility = false;
         selectedUnit->ap -= selectedAbility->unitApCost;
-        player.ap -= selectedAbility->playerApCost;
+        player->ap -= selectedAbility->playerApCost;
     }
 }
 
-void sAutoDeselectAbility(Unit *&selectedUnit, Ability *&selectedAbility)
+void sAutoDeselectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility)
 {
     if (selectedUnit && selectedAbility)
     {

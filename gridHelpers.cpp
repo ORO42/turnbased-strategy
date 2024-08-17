@@ -1,7 +1,7 @@
 #include "include/gridHelpers.h"
 #include "include/PerlinNoise.hpp"
 
-void setupRectangularGrid(int width, int height, std::vector<Tile> &allTiles, Texture2D &tex)
+void setupRectangularGrid(int width, int height, VectorSharedPointer<Tile> &allTiles, Texture2D &tex)
 {
     const siv::PerlinNoise::seed_type seed = 123456u;
     const siv::PerlinNoise perlin{seed};
@@ -14,7 +14,7 @@ void setupRectangularGrid(int width, int height, std::vector<Tile> &allTiles, Te
             float tly = y * 32.0f;
             const double frequency = 0.1; // 0.01 - 0.64
             const double noise = perlin.octave2D_01((x * frequency), (y * frequency), 8);
-            Tile newTile{tlx, tly, tex, 0.0, TerrainType::NORMAL, floor(noise * 10)};
+            SharedPointer<Tile> newTile = std::make_shared<Tile>(Tile{tlx, tly, tex, 0.0, TerrainType::NORMAL, floor(noise * 10)});
             allTiles.push_back(newTile);
         }
     }
@@ -30,23 +30,23 @@ void setupRectangularGrid(int width, int height, std::vector<Tile> &allTiles, Te
     // draw rocks
 }
 
-void sDrawRectangularGrid(std::vector<Tile> &allTiles)
+void sDrawRectangularGrid(VectorSharedPointer<Tile> &allTiles)
 {
     for (auto &tile : allTiles)
     {
-        DrawTexture(tile.tex, tile.pos.x, tile.pos.y, WHITE);
+        DrawTexture(tile->tex, tile->pos.x, tile->pos.y, WHITE);
         // TODO for performance, only draw the visual grid for tiles that are in the viewport
         // DrawRectangleLinesEx((Rectangle){tile.pos.x, tile.pos.y, 32.0f, 32.0f}, 0.5f, GRAY);
     };
 }
 
-void sTileHover(std::vector<Tile> &allTiles, Tile *&hoveredTile, Vector2 &worldMousePos)
+void sTileHover(VectorSharedPointer<Tile> &allTiles, SharedPointer<Tile> &hoveredTile, Vector2 &worldMousePos)
 {
     for (auto &tile : allTiles)
     {
-        if (CheckCollisionPointRec(worldMousePos, (Rectangle){tile.pos.x, tile.pos.y, 32.0f, 32.0f}))
+        if (CheckCollisionPointRec(worldMousePos, (Rectangle){tile->pos.x, tile->pos.y, 32.0f, 32.0f}))
         {
-            hoveredTile = &tile;
+            hoveredTile = tile;
         }
         // else
         // {
@@ -55,7 +55,7 @@ void sTileHover(std::vector<Tile> &allTiles, Tile *&hoveredTile, Vector2 &worldM
     };
 }
 
-int chebyshevTileDistance(const Vector2 &pos1, const Vector2 &pos2)
+int chebyshevTileDistance(const Vector2 pos1, const Vector2 pos2)
 {
     // Calculate the tile distance between two tiles using Chebyshev distance
     int dx = std::abs(pos1.x - pos2.x);
@@ -68,22 +68,19 @@ int chebyshevTileDistance(const Vector2 &pos1, const Vector2 &pos2)
     return tileDistance;
 }
 
-Tile getTileForPoint(const Vector2 &pos, std::vector<Tile> &allTiles)
+SharedPointer<Tile> getTileForPoint(const Vector2 pos, VectorSharedPointer<Tile> &allTiles)
 {
     for (auto &tile : allTiles)
     {
-        if (CheckCollisionPointRec(pos, {tile.pos.x, tile.pos.y, 32.0f, 32.0f}))
+        if (CheckCollisionPointRec(pos, {tile->pos.x, tile->pos.y, 32.0f, 32.0f}))
         {
             return tile;
         }
-        else
-        {
-            return {};
-        }
     }
+    return {};
 }
 
-Rectangle createRectAroundRect(const Rectangle &innerRect, const int &radius)
+Rectangle createRectAroundRect(const Rectangle innerRect, const int radius)
 {
     Vector2 centerPoint = {innerRect.x + innerRect.width / 2,
                            innerRect.y + innerRect.height / 2};
@@ -103,14 +100,14 @@ Rectangle createRectAroundRect(const Rectangle &innerRect, const int &radius)
     return outerRect;
 }
 
-std::vector<Tile> getTilesInRect(const Rectangle &rect, const int &radius, std::vector<Tile> &allTiles)
+VectorSharedPointer<Tile> getTilesInRect(const Rectangle rect, const int radius, VectorSharedPointer<Tile> &allTiles)
 {
-    std::vector<Tile> overlappingTiles;
+    VectorSharedPointer<Tile> overlappingTiles;
 
     // get all the tiles overlapping the rect
     for (auto &tile : allTiles)
     {
-        if (CheckCollisionRecs(rect, {tile.pos.x, tile.pos.y, 32.0f, 32.0f}))
+        if (CheckCollisionRecs(rect, {tile->pos.x, tile->pos.y, 32.0f, 32.0f}))
         {
             overlappingTiles.push_back(tile);
         }
@@ -140,7 +137,7 @@ std::vector<Tile> getTilesInRect(const Rectangle &rect, const int &radius, std::
 //     return overlappingTiles;
 // }
 
-void createGridSubdivisions(std::vector<GridSubdivision> &allGridSubdivisions, const std::vector<Tile> &allTiles, int width, int height, int numSegmentsX, int numSegmentsY)
+void createGridSubdivisions(VectorSharedPointer<GridSubdivision> &allGridSubdivisions, const VectorSharedPointer<Tile> &allTiles, int width, int height, int numSegmentsX, int numSegmentsY)
 {
     // Calculate the size of each segment
     float segmentWidth = static_cast<float>(width) / numSegmentsX;
@@ -152,18 +149,18 @@ void createGridSubdivisions(std::vector<GridSubdivision> &allGridSubdivisions, c
         for (float x = 0; x < width; x += segmentWidth)
         {
             // Create a new GridSubdivision for the segment
-            GridSubdivision subdivision;
-            subdivision.pos = {x, y};
-            subdivision.w = segmentWidth;
-            subdivision.h = segmentHeight;
+            SharedPointer<GridSubdivision> subdivision = std::make_shared<GridSubdivision>();
+            subdivision->pos = {x, y};
+            subdivision->w = segmentWidth;
+            subdivision->h = segmentHeight;
 
             // Iterate over each tile and check if it belongs to this segment
-            for (const Tile &tile : allTiles)
+            for (auto &tile : allTiles)
             {
-                if (tile.pos.x >= x && tile.pos.x < x + segmentWidth &&
-                    tile.pos.y >= y && tile.pos.y < y + segmentHeight)
+                if (tile->pos.x >= x && tile->pos.x < x + segmentWidth &&
+                    tile->pos.y >= y && tile->pos.y < y + segmentHeight)
                 {
-                    subdivision.tilesInSubdivision.push_back(tile);
+                    subdivision->tilesInSubdivision.push_back(tile);
                 }
             }
 
@@ -173,14 +170,14 @@ void createGridSubdivisions(std::vector<GridSubdivision> &allGridSubdivisions, c
     }
 }
 
-std::vector<Tile> getAllTilesSubdivRectCollision(std::vector<GridSubdivision> &allGridSubdivisions, Rectangle rect)
+VectorSharedPointer<Tile> getAllTilesSubdivRectCollision(VectorSharedPointer<GridSubdivision> &allGridSubdivisions, Rectangle rect)
 {
-    std::vector<Tile> allTiles;
+    VectorSharedPointer<Tile> allTiles;
     for (auto &subdiv : allGridSubdivisions)
     {
-        if (CheckCollisionRecs({subdiv.pos.x, subdiv.pos.y, subdiv.w, subdiv.h}, rect))
+        if (CheckCollisionRecs({subdiv->pos.x, subdiv->pos.y, subdiv->w, subdiv->h}, rect))
         {
-            for (auto &tile : subdiv.tilesInSubdivision)
+            for (auto &tile : subdiv->tilesInSubdivision)
             {
                 allTiles.push_back(tile);
             }
@@ -189,17 +186,17 @@ std::vector<Tile> getAllTilesSubdivRectCollision(std::vector<GridSubdivision> &a
     return allTiles;
 }
 
-Tile getTileForPointFromSubdivs(Position &p, std::vector<GridSubdivision> &allGridSubdivisions)
+SharedPointer<Tile> getTileForPointFromSubdivs(Position p, VectorSharedPointer<GridSubdivision> &allGridSubdivisions)
 {
-    Tile foundTile = {};
+    SharedPointer<Tile> foundTile = {};
 
     for (auto gSubdiv : allGridSubdivisions)
     {
-        if (CheckCollisionPointRec({p.x, p.y}, {gSubdiv.pos.x, gSubdiv.pos.y, gSubdiv.w, gSubdiv.h}))
+        if (CheckCollisionPointRec({p.x, p.y}, {gSubdiv->pos.x, gSubdiv->pos.y, gSubdiv->w, gSubdiv->h}))
         {
-            for (auto tile : gSubdiv.tilesInSubdivision)
+            for (auto tile : gSubdiv->tilesInSubdivision)
             {
-                if (CheckCollisionPointRec({p.x, p.y}, {tile.pos.x, tile.pos.y, static_cast<float>(tile.tex.width), static_cast<float>(tile.tex.height)}))
+                if (CheckCollisionPointRec({p.x, p.y}, {tile->pos.x, tile->pos.y, static_cast<float>(tile->tex.width), static_cast<float>(tile->tex.height)}))
                 {
                     foundTile = tile;
                 }

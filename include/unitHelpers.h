@@ -9,14 +9,14 @@
 void createUnit(
     UnitType unitType,
     Position pos,
-    Player &player,
+    SharedPointer<Player> &player,
     Teams team,
-    std::vector<Unit> &allUnits,
+    VectorSharedPointer<Unit> &allUnits,
     Texture2D &unitTex);
-void sPositionVisionTrapezoids(std::vector<Unit> &allUnits);
-void sVisibility(std::vector<Unit> &allUnits, Player &player);
-void DEBUGsHoveredTileOverlappingTrap(Tile *&hoveredTile, std::vector<Unit> &allUnits);
-bool shouldRenderUnitDueToVisibility(Unit &unit, Player &player);
-void sMoveUnits(std::vector<Unit> &allUnits, float deltaTime);
-bool isMouseOverAnyUnit(std::vector<Unit> &allUnits, Vector2 &worldMousePos);
-void sUnitHover(std::vector<Unit> &allUnits, Unit *&hoveredUnit, Vector2 &worldMousePos);
+void sPositionVisionTrapezoids(VectorSharedPointer<Unit> &allUnits);
+void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player);
+void DEBUGsHoveredTileOverlappingTrap(SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Unit> &allUnits);
+bool shouldRenderUnitDueToVisibility(SharedPointer<Unit> &unit, SharedPointer<Player> &player);
+void sMoveUnits(VectorSharedPointer<Unit> &allUnits, float deltaTime);
+bool isMouseOverAnyUnit(VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos);
+void sUnitHover(VectorSharedPointer<Unit> &allUnits, SharedPointer<Unit> &hoveredUnit, Vector2 &worldMousePos);
