@@ -79,13 +79,32 @@ void createUnit(
     moveAbility->accuracyRadius = -1; // NOTE 0 means just a single tile
     moveAbility->placesUnit = UnitType::NA;
 
+    SharedPointer<Ability> placeRiflemanAbility = std::make_shared<Ability>();
+    placeRiflemanAbility->uuid = generateUUID();
+    placeRiflemanAbility->abilityType = AbilityTypes::PLACE_RIFLEMAN;
+    placeRiflemanAbility->displayTitle = "Place Rifleman";
+    placeRiflemanAbility->isPlayerAbility = false;
+    placeRiflemanAbility->playerApCost = 0.0f;
+    placeRiflemanAbility->playerXpRequirement = 0.0f;
+    placeRiflemanAbility->unitApCost = 5.0f;
+    placeRiflemanAbility->unitXpRequirement = 0.0f;
+    placeRiflemanAbility->damage = 0.0f;
+    placeRiflemanAbility->turnCooldown = 0;
+    placeRiflemanAbility->lastTurnUsed = 0;
+    placeRiflemanAbility->useQty = false;
+    placeRiflemanAbility->qty = 0;
+    placeRiflemanAbility->isQtyReplenishable = false;
+    placeRiflemanAbility->reachRadius = 1;
+    placeRiflemanAbility->accuracyRadius = -1; // NOTE 0 means just a single tile
+    placeRiflemanAbility->placesUnit = UnitType::RIFLEMAN;
+
     if (unitType == UnitType::RIFLEMAN)
     {
         newUnit->attack = 25.0f;
         newUnit->accuracy = 50.0f;
         newUnit->maxAp = 100.0f;
         newUnit->ap = newUnit->maxAp;
-        newUnit->abilities = VectorSharedPointer<Ability>{moveAbility, rotateAbility, rifleAbility};
+        newUnit->abilities = VectorSharedPointer<Ability>{moveAbility, rotateAbility, rifleAbility, placeRiflemanAbility};
 
         newUnit->tex = unitTex;
 
