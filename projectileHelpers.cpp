@@ -179,6 +179,7 @@ void precomputeProjectileBehavior(SharedPointer<Projectile> &projectile, SharedP
                 // get first blocking item, which becomes the end rect
                 // ignore stoppage chance never
             }
+            // choose closest blocking obstacle vs unit
             // for each potentially blocking item, including one null rect (-1, -1) (probably use a "sailOff" flag on the projectile instead) choose randomly to become end rect
             // if null rect, the projectile should move along the angle until it leaves the map, at which point it gets destroyed (in the movement function)
         }
