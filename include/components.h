@@ -20,6 +20,7 @@ enum struct AbilityTypes
     MOVE,
     ROTATE,
     MORTAR_VOLLEY,
+    PLACE_RIFLEMAN,
     NA,
 };
 
@@ -132,7 +133,7 @@ struct Ability
     int qty;
     bool isQtyReplenishable;
     int reachRadius;
-    int effectRadius;
+    int accuracyRadius;
     UnitType placesUnit;
 };
 
@@ -185,6 +186,7 @@ struct Obstacle
     bool visibleInStanding; // units in this stance behind the obstacle will not be visible to other units between the obstacle and the unit
     float health = 0.0;
     ProjectileStoppage projectileStoppage;
+    int elevation; // used for calculating visibility (0 is sea level, -0.5 is a trench, human is 1)
 };
 
 struct GridSubdivision
@@ -212,10 +214,12 @@ struct Projectile
     bool canCollideBeforeDestination; // determined by an initial accuracy roll, or manually when creating the projectile
     bool shouldDestroy;               // if this projectile needs to be removed
     bool causesExplosion;
-    int effectRadius;
+    int damageRadius;
+    int accuracyRadius;
     float damage;
     float accuracy; // the chance this projectile causes damage to each unit/obstacle
     std::vector<std::string> idsToIgnoreInFlight;
     // Position endPos;                             // the point at which the projectile needs to be destroyed (used to get overlapping obstacles, units, tiles)
     Rectangle endRect = {-1.0f, -1.0f};
+    // bool doesStopAtEndRect = true; // for use with precomputed projectiles. If false, the obstacle moves past the end rect (assigned at runtime)
 };

@@ -100,6 +100,34 @@ Rectangle createRectAroundRect(const Rectangle innerRect, const int radius)
     return outerRect;
 }
 
+std::vector<Rectangle> deduceInnerRectangles(const Rectangle outerRect)
+{
+    std::vector<Rectangle> rectangles;
+
+    // Define the size of the small rectangles
+    float rectWidth = 32.0f;
+    float rectHeight = 32.0f;
+
+    // Calculate the number of rectangles that fit along the width and height
+    int numRectsX = static_cast<int>(outerRect.width / rectWidth);
+    int numRectsY = static_cast<int>(outerRect.height / rectHeight);
+
+    // Iterate over the area of the outer rectangle
+    for (int i = 0; i < numRectsX; i++)
+    {
+        for (int j = 0; j < numRectsY; j++)
+        {
+            float x = outerRect.x + i * rectWidth;
+            float y = outerRect.y + j * rectHeight;
+
+            Rectangle smallRect = {x, y, rectWidth, rectHeight};
+            rectangles.push_back(smallRect);
+        }
+    }
+
+    return rectangles;
+}
+
 VectorSharedPointer<Tile> getTilesInRect(const Rectangle rect, const int radius, VectorSharedPointer<Tile> &allTiles)
 {
     VectorSharedPointer<Tile> overlappingTiles;

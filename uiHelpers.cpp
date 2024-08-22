@@ -105,12 +105,12 @@ void sDrawHoveredTileIndicator(SharedPointer<Tile> &hoveredTile, SharedPointer<A
     }
 }
 
-void sDrawEffectRadius(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile)
+void sDrawaccuracyRadius(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile)
 {
     if (selectedAbility && selectedUnit && hoveredTile)
     {
-        Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
-        DrawRectangleLinesEx({effectRadiusRect.x, effectRadiusRect.y, effectRadiusRect.width, effectRadiusRect.height}, 0.5, BLUE);
+        Rectangle accuracyRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->accuracyRadius);
+        DrawRectangleLinesEx({accuracyRadiusRect.x, accuracyRadiusRect.y, accuracyRadiusRect.width, accuracyRadiusRect.height}, 0.5, BLUE);
     }
 }
 
@@ -233,7 +233,7 @@ void sDrawFacingAngleIndicator(VectorSharedPointer<Unit> &allUnits, SharedPointe
 
 void sDrawDistanceIndicators(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos)
 {
-    if (selectedAbility && selectedUnit && selectedAbility->reachRadius > -1)
+    if (selectedAbility && selectedUnit)
     {
         Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
         Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
@@ -256,5 +256,19 @@ void sDrawReachRadiusRect(SharedPointer<Ability> &selectedAbility, SharedPointer
     {
         Rectangle reachRadiusRect = createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, selectedAbility->reachRadius);
         DrawRectangleLinesEx({reachRadiusRect.x, reachRadiusRect.y, (reachRadiusRect.width), (reachRadiusRect.height)}, 1.0, WHITE);
+    }
+}
+
+void sDrawHealthValues(VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles)
+{
+    for (auto &unit : allUnits)
+    {
+        Position unitCenter = getRectCenter((Rectangle){unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)});
+        DrawText(TextFormat("%.0f", unit->health), unitCenter.x, unitCenter.y, 12, WHITE);
+    }
+    for (auto &obstacle : allObstacles)
+    {
+        Position obstacleCenter = getRectCenter((Rectangle){obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)});
+        DrawText(TextFormat("%.0f", obstacle->health), obstacleCenter.x, obstacleCenter.y - 12, 12, YELLOW);
     }
 }

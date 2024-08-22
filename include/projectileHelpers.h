@@ -9,7 +9,7 @@
 #include <cmath>
 #include <unordered_set>
 
-void createProjectile(
+SharedPointer<Projectile> createProjectile(
     VectorSharedPointer<Projectile> &allProjectiles,
     Texture2D tex,
     Position originPos,
@@ -21,7 +21,7 @@ void createProjectile(
     float speed,
     bool canCollideBeforeDestination,
     bool causesExplosion,
-    int projectileEffectRadius,
+    int projectileaccuracyRadius,
     float damage,
     float accuracy);
 ;

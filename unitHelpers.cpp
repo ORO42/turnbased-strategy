@@ -38,7 +38,7 @@ void createUnit(
     rifleAbility->qty = 0;
     rifleAbility->isQtyReplenishable = false;
     rifleAbility->reachRadius = 10;
-    rifleAbility->effectRadius = 0; // NOTE 0 means just a single tile
+    rifleAbility->accuracyRadius = 1; // NOTE 0 means just a single tile
     rifleAbility->placesUnit = UnitType::NA;
 
     SharedPointer<Ability> rotateAbility = std::make_shared<Ability>();
@@ -57,7 +57,7 @@ void createUnit(
     rotateAbility->qty = 0;
     rotateAbility->isQtyReplenishable = false;
     rotateAbility->reachRadius = -1;
-    rotateAbility->effectRadius = -1; // NOTE 0 means just a single tile
+    rotateAbility->accuracyRadius = -1; // NOTE 0 means just a single tile
     rotateAbility->placesUnit = UnitType::NA;
 
     SharedPointer<Ability> moveAbility = std::make_shared<Ability>();
@@ -76,7 +76,7 @@ void createUnit(
     moveAbility->qty = 0;
     moveAbility->isQtyReplenishable = false;
     moveAbility->reachRadius = 5;
-    moveAbility->effectRadius = -1; // NOTE 0 means just a single tile
+    moveAbility->accuracyRadius = -1; // NOTE 0 means just a single tile
     moveAbility->placesUnit = UnitType::NA;
 
     if (unitType == UnitType::RIFLEMAN)

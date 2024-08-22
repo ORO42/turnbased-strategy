@@ -10,6 +10,7 @@ void sTileHover(VectorSharedPointer<Tile> &allTiles, SharedPointer<Tile> &hovere
 int chebyshevTileDistance(const Vector2 pos1, const Vector2 pos2);
 SharedPointer<Tile> getTileForPoint(const Vector2 pos, VectorSharedPointer<Tile> &allTiles);
 Rectangle createRectAroundRect(const Rectangle innerRect, const int radius);
+std::vector<Rectangle> deduceInnerRectangles(const Rectangle outerRect);
 VectorSharedPointer<Tile> getTilesInRect(const Rectangle rect, const int radius, VectorSharedPointer<Tile> &allTiles);
 void createGridSubdivisions(VectorSharedPointer<GridSubdivision> &allGridSubdivisions, const VectorSharedPointer<Tile> &allTiles, int width, int height, int numSegmentsX, int numSegmentsY);
 VectorSharedPointer<Tile> getAllTilesSubdivRectCollision(VectorSharedPointer<GridSubdivision> &allGridSubdivisions, Rectangle rect);

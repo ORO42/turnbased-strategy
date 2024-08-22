@@ -73,12 +73,12 @@ void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &s
 //     {
 //         if (selectedAbility->canAffectUnit || selectedAbility->canAffectObstacle || selectedAbility->canAffectSelf)
 //         {
-//             Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
+//             Rectangle accuracyRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->accuracyRadius);
 //             if (selectedAbility->canAffectUnit)
 //             {
 //                 for (auto &unit : allUnits)
 //                 {
-//                     if (CheckCollisionRecs(effectRadiusRect, (Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
+//                     if (CheckCollisionRecs(accuracyRadiusRect, (Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}))
 //                     {
 //                         unitsToAffect.push_back(&unit); // TODO does this create a copy or reference the object in the main vector?
 //                     }
@@ -89,7 +89,7 @@ void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &s
 //             {
 //                 for (auto &obstacle : allObstacles)
 //                 {
-//                     if (CheckCollisionRecs(effectRadiusRect, (Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}))
+//                     if (CheckCollisionRecs(accuracyRadiusRect, (Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}))
 //                     {
 //                         obstaclesToAffect.push_back(&obstacle);
 //                     }
@@ -98,7 +98,7 @@ void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &s
 
 //             if (selectedAbility->canAffectSelf)
 //             {
-//                 if (CheckCollisionRecs(effectRadiusRect, (Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}))
+//                 if (CheckCollisionRecs(accuracyRadiusRect, (Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}))
 //                 {
 //                     unitsToAffect.push_back(selectedUnit);
 //                 }
@@ -208,33 +208,48 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
                 Position hoveredTileCenter = getRectCenter({hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
                 float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, hoveredTileCenter);
 
+                // 1. Accuracy Roll. If accuracy fails, the target rect will not be hit. Either it will miss the target or it will hit a blocker
+                // 2. Draw lines between every corner of both rects
+                // 3. Iterate over all units and obstacles, ignore selectedUnitCenter and unit/obstacle at targetRect
+                // 4. Add all blocking units/obstacles to a vector
+                // 5. If unit
+
                 //////////////////////////////////////////////////////////////////////
                 /////////////////// PRECOMPUTE PROJECTILE BEHAVIOR ///////////////////
                 /////////////////////////////////////////////////////////////////////
 
                 // // establish effect radius
-                // Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
+                Rectangle accuracyRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->accuracyRadius);
 
-                // std::vector<Line> hoveredTileCornerToCornerRays;
+                std::vector<Line> hoveredTileCornerToCornerRays;
 
-                // Rectangle destinationRect = effectRadiusRect;
-                // bool useOriginalDestinationRect = true;
-
-                // std::vector<Obstacle *> obstaclesInEffectRadius;
-                // std::vector<Unit *> unitsInEffectRadius;
-                // // std::vector<Obstacle> obstaclesInEffectRadiusToModify; // NOTE derived from inEffectRadius vectors, passed to projectile, since derived from vector contains pointers to refs, modifying contents in this vector should modify original
-                // // std::vector<Unit> unitsInEffectRadiusToModify;         // NOTE derived from inEffectRadius vectors, passed to projectile, since derived from vector contains pointers to refs, modifying contents in this vector should modify original
+                VectorSharedPointer<Obstacle> obstaclesInDamageRadius;
+                VectorSharedPointer<Unit> unitsInDamageRadius;
+                VectorSharedPointer<Obstacle> obstaclesInDamageRadiusToModify; // NOTE derived from inAccuracyRadius vectors, passed to projectile, since derived from vector contains pointers to refs, modifying contents in this vector should modify original
+                VectorSharedPointer<Unit> unitsInDamageRadiusToModify;         // NOTE derived from inAccuracyRadius vectors, passed to projectile, since derived from vector contains pointers to refs, modifying contents in this vector should modify original
 
                 // // detect collisions en route to destination
-                // std::vector<Obstacle> blockingObstacles;
-                // std::vector<Unit> blockingUnits;
+                VectorSharedPointer<Obstacle> blockingObstacles;
+                VectorSharedPointer<Unit> blockingUnits;
+
+                std::vector<Rectangle> potentialEndRects;
+
+                VectorSharedPointer<Rectangle> obstacleCornerLines;
+                VectorSharedPointer<Rectangle> unitCornerLines;
+
+                // Step 1: choose a rectangle inside the accuracy radius to be the destination
+                // Step 2: Check if any obstacle or unit is in between the origin and destination and if those obstacles are passable, considering if the projectile collides en route or not
+                // Step 3: If the projectile is able to reach the destination, check if there exists and obstacle or unit at that destination, and consider it's stoppage type
+                // Step 4: Damage non-blocked objects in the damage radius
+
+                targetRect = getRandomItemFromVector(deduceInnerRectangles(accuracyRadiusRect));
 
                 // for (auto &obstacle : allObstacles)
                 // {
-                //     // find obstacles in desired effectRadiusRect
-                //     if (CheckCollisionRecs((Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, effectRadiusRect))
+                //     // find obstacles in desired accuracyRadiusRect
+                //     if (CheckCollisionRecs((Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, accuracyRadiusRect))
                 //     {
-                //             obstaclesInEffectRadius.push_back(&obstacle);
+                //             obstaclesInaccuracyRadius.push_back(&obstacle);
                 //             TODO create lines
                 //     }
 
@@ -254,10 +269,10 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
 
                 // for (auto &unit : allUnits)
                 // {
-                //     // find units in desired effectRadiusRect
-                //     if (CheckCollisionRecs((Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, effectRadiusRect))
+                //     // find units in desired accuracyRadiusRect
+                //     if (CheckCollisionRecs((Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, accuracyRadiusRect))
                 //     {
-                //             unitsInEffectRadius.push_back(&unit);
+                //             unitsInaccuracyRadius.push_back(&unit);
                 //             TODO create lines
                 //     }
 
@@ -345,32 +360,32 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
                 // {
                 //     if (calculateChance(selectedUnit->accuracy))
                 //     {
-                //         // hovered tile is destination, already computed units/obstacles for that effectRadius
+                //         // hovered tile is destination, already computed units/obstacles for that accuracyRadius
                 //     }
                 //     else
                 //     {
                 //         // choose a unit or obstacle to be the destination
                 //     }
                 // }
-                // else // means need to find units and obstacles for new effectRadius around this destination
+                // else // means need to find units and obstacles for new accuracyRadius around this destination
                 // {
-                //     obstaclesInEffectRadius = {};
-                //     unitsInEffectRadius = {};
+                //     obstaclesInaccuracyRadius = {};
+                //     unitsInaccuracyRadius = {};
                 //     for (auto &obstacle : allObstacles)
                 //     {
-                //         // find obstacles in desired effectRadiusRect
-                //         if (CheckCollisionRecs((Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, effectRadiusRect))
+                //         // find obstacles in desired accuracyRadiusRect
+                //         if (CheckCollisionRecs((Rectangle){obstacle.pos.x, obstacle.pos.y, static_cast<float>(obstacle.tex.width), static_cast<float>(obstacle.tex.height)}, accuracyRadiusRect))
                 //         {
-                //             obstaclesInEffectRadius.push_back(&obstacle);
+                //             obstaclesInaccuracyRadius.push_back(&obstacle);
                 //         }
                 //     }
                 //     for (auto &unit : allUnits)
                 //     {
-                //         // find units in effectRadiusRect in the same loop
-                //         // find obstacles in desired effectRadiusRect
-                //         if (CheckCollisionRecs((Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, effectRadiusRect))
+                //         // find units in accuracyRadiusRect in the same loop
+                //         // find obstacles in desired accuracyRadiusRect
+                //         if (CheckCollisionRecs((Rectangle){unit.pos.x, unit.pos.y, static_cast<float>(unit.tex.width), static_cast<float>(unit.tex.height)}, accuracyRadiusRect))
                 //         {
-                //             unitsInEffectRadius.push_back(&unit);
+                //             unitsInaccuracyRadius.push_back(&unit);
                 //         }
                 //     }
                 // }
@@ -380,7 +395,7 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
                 /////////////////////////////////////////////////////////////////////
 
                 // create projectile
-                // createProjectile(allProjectiles, projectileTex, selectedUnitCenter, hoveredTileCenter, selectedUnit->uuid, selectedUnit->team, false, angleToRotationTarget, 100.0f, true, false, selectedAbility->effectRadius, selectedAbility->damage, selectedUnit->accuracy);
+                // createProjectile(allProjectiles, projectileTex, selectedUnitCenter, hoveredTileCenter, selectedUnit->uuid, selectedUnit->team, false, angleToRotationTarget, 100.0f, true, false, selectedAbility->accuracyRadius, selectedAbility->damage, selectedUnit->accuracy);
                 createProjectile(allProjectiles, projectileTex, selectedUnitCenter, targetRect, selectedUnit->uuid, selectedUnit->team, angleToRotationTarget, 100.0f, true, false, 0, selectedAbility->damage, selectedUnit->accuracy);
 
                 useAbility = true;
@@ -390,46 +405,11 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
         case AbilityTypes::MORTAR_VOLLEY:
             if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
             {
-                Position selectedUnitCenter = getRectCenter((Rectangle){selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)});
-                Position hoveredTileCenter = getRectCenter((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)});
-
-                // establish effect radius
-                Rectangle effectRadiusRect = createRectAroundRect((Rectangle){hoveredTile->pos.x, hoveredTile->pos.y, static_cast<float>(hoveredTile->tex.width), static_cast<float>(hoveredTile->tex.height)}, selectedAbility->effectRadius);
-                // get tiles in effectRadiusRect
-                VectorSharedPointer<Tile> tilesInEffectRadius;
-                for (auto &gsubdiv : allGridSubdivisions)
-                {
-                    if (CheckCollisionRecs(effectRadiusRect, {gsubdiv->pos.x, gsubdiv->pos.y, gsubdiv->w, gsubdiv->w}))
-                    {
-                        for (auto &tile : gsubdiv->tilesInSubdivision)
-                        {
-                            if (CheckCollisionRecs(effectRadiusRect, {tile->pos.x, tile->pos.y, static_cast<float>(tile->tex.width), static_cast<float>(tile->tex.height)}))
-                            {
-                                tilesInEffectRadius.push_back(tile);
-                            }
-                        }
-                    }
-                }
-                // choose tiles out of those in effect radius
-                // create a random device and a random engine
-                std::random_device rd;
-                std::mt19937 g(rd());
-                // shuffle the vector
-                std::shuffle(tilesInEffectRadius.begin(), tilesInEffectRadius.end(), g);
-                // select first 3 tiles from shuffled tilesInEffectRadius
-                VectorSharedPointer<Tile> chosenTiles(tilesInEffectRadius.begin(), tilesInEffectRadius.begin() + 3);
-                for (auto &tile : chosenTiles)
-                {
-                    // create projectiles
-                    Position tileCenter = getRectCenter({tile->pos.x, tile->pos.y, static_cast<float>(tile->tex.width), static_cast<float>(tile->tex.height)});
-                    float angleToRotationTarget = getAngleBetweenPoints(selectedUnitCenter, tileCenter);
-                    // TODO invoke create projectile function
-                }
-
                 useAbility = true;
             }
             break;
         }
+        case AbilityTypes::
     }
     else if (selectedAbility && !selectedUnit) // means it's a player ability
     {

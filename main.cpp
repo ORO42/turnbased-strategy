@@ -71,7 +71,7 @@ int main(void)
     // define signals
     // Signal<PrepareTrapezoidRotationPayload> prepareTrapezoidRotationSignal;
 
-    // // connect signal slots
+    // // // connect signal slots
     // prepareTrapezoidRotationSignal.connect([&](const PrepareTrapezoidRotationPayload &payload)
     //                                        { setVisionTrapezoidRotation(payload); });
 
@@ -143,8 +143,8 @@ int main(void)
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player);
         sMoveUnits(allUnits, deltaTime);
-        sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
-        sProjectileDamage(allProjectiles, allUnits, allObstacles);
+        // sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
+        // sProjectileDamage(allProjectiles, allUnits, allObstacles);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
@@ -165,13 +165,14 @@ int main(void)
         sDrawAllTextures(allUnits, allTiles, allObstacles, allProjectiles, camera, player);
         sDrawSelectedUnitIndicator(selectedUnit);
         sDrawHoveredTileIndicator(hoveredTile, selectedAbility);
-        sDrawEffectRadius(selectedUnit, selectedAbility, hoveredTile);
+        sDrawaccuracyRadius(selectedUnit, selectedAbility, hoveredTile);
         sDrawRotationChevron(allUnits, camera, chevronTex, player);
         sDrawVisionTrapezoids(allUnits, camera, player);
         // DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
         sDrawFacingAngleIndicator(allUnits, player);
         sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
+        sDrawHealthValues(allUnits, allObstacles);
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode
