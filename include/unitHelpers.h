@@ -5,6 +5,7 @@
 #include "uuid.h"
 #include "geometryHelpers.h"
 #include "raymath.h"
+#include "generalUtils.h"
 
 void createUnit(
     UnitType unitType,
