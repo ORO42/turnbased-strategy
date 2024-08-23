@@ -111,7 +111,7 @@ int main(void)
 
     createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
     createUnit(UnitType::RIFLEMAN, {320.0f + 32.0f, 320.0f}, player, Teams::BLUETEAM, allUnits, unitTex);
-    createUnit(UnitType::RIFLEMAN, {320.0f, 320.0f + 32.0f * 2}, player, Teams::REDTEAM, allUnits, unitTex);
+    createUnit(UnitType::RIFLEMAN, {320.0f + 32.0f, 320.0f + 32.0f * 2}, player, Teams::REDTEAM, allUnits, unitTex);
     createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f}, wallTex, allObstacles);
     createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 2}, wallTex, allObstacles);
     createObstacle(ObstacleType::WALL, {320.0f, 320.0f + 32.0f * 3}, wallTex, allObstacles);
@@ -141,7 +141,7 @@ int main(void)
         sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, projectileTex);
         sClearStates(selectedUnit, selectedAbility);
         sPositionVisionTrapezoids(allUnits);
-        sVisibility(allUnits, player);
+        sVisibility(allUnits, player, allObstacles);
         sMoveUnits(allUnits, deltaTime);
         // sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
         // sProjectileDamage(allProjectiles, allUnits, allObstacles);

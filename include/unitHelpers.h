@@ -15,7 +15,7 @@ void createUnit(
     VectorSharedPointer<Unit> &allUnits,
     Texture2D &unitTex);
 void sPositionVisionTrapezoids(VectorSharedPointer<Unit> &allUnits);
-void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player);
+void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player, VectorSharedPointer<Obstacle> &allObstacles);
 void DEBUGsHoveredTileOverlappingTrap(SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Unit> &allUnits);
 bool shouldRenderUnitDueToVisibility(SharedPointer<Unit> &unit, SharedPointer<Player> &player);
 void sMoveUnits(VectorSharedPointer<Unit> &allUnits, float deltaTime);

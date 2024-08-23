@@ -141,7 +141,6 @@ void sPositionVisionTrapezoids(VectorSharedPointer<Unit> &allUnits)
 
 void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &player, VectorSharedPointer<Obstacle> &allObstacles)
 {
-    // std::vector<Unit> unitsInTrap = {};
     for (auto &unit : allUnits)
     {
         IsoscelesTrapezoid trap1 = unit->visionTrapezoid;
@@ -155,27 +154,28 @@ void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &pla
                     if (checkTrapRectOverlap(trap1, {unit2->pos.x, unit2->pos.y, static_cast<float>(unit2->tex.width), static_cast<float>(unit2->tex.height)}))
                     {
                         // cast rays to each unit, check if overlap any obstacles
-                        // std::vector<Line> cornerLines = getCornerToCornerLines({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}, {unit2->pos.x, unit2->pos.y, static_cast<float>(unit2->tex.width), static_cast<float>(unit2->tex.height)});
-                        // int blockedCt = 0;
+                        std::vector<Line> cornerLines = getCornerToCornerLines({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}, {unit2->pos.x, unit2->pos.y, static_cast<float>(unit2->tex.width), static_cast<float>(unit2->tex.height)});
+                        int blockedCt = 0;
 
-                        // for (auto &line : cornerLines)
-                        // {
-                        //     for (auto &obstacle : allObstacles)
-                        //     {
-                        //         // if all lines are intersecting an obstacle, the unit will not be visible
-                        //         // TODO ignore origin and end obstacles
-                        //         if (lineRectOverlap({obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)}, line))
-                        //         {
-                        //             blockedCt += 1;
-                        //             // need to break out and check next line
-                        //         }
-                        //     }
-                        // }
-                        // if (blockedCt < 4)
-                        // {
-                        //     unit2->isVisibleToOppositeTeam = true;
-                        // }
-                        unit2->isVisibleToOppositeTeam = true;
+                        for (auto &line : cornerLines)
+                        {
+                            for (auto &obstacle : allObstacles)
+                            {
+                                // if all lines are intersecting an obstacle, the unit will not be visible
+                                // TODO ignore origin and end obstacles
+                                if (lineRectOverlap({obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)}, line))
+                                {
+                                    blockedCt += 1;
+                                    // need to break out and check next line
+                                    break;
+                                }
+                            }
+                        }
+                        std::cout << blockedCt << std::endl;
+                        if (blockedCt < 16) // 16 lines are created from getCornerToCornerLines()
+                        {
+                            unit2->isVisibleToOppositeTeam = true;
+                        }
                     }
                     else
                     {
