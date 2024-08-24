@@ -21,6 +21,30 @@ float getAngleBetweenPoints(Position p1, Position p2)
     return angleInDegrees;
 }
 
+float getRandomAngleWithinRange(float originalAngle, float range)
+{
+    // Initialize random seed
+    std::srand(static_cast<unsigned int>(std::time(0)));
+
+    // Generate a random offset within the range [-range, +range]
+    float randomOffset = static_cast<float>(std::rand()) / (static_cast<float>(RAND_MAX / (2 * range))) - range;
+
+    // Calculate the new angle
+    float newAngle = originalAngle + randomOffset;
+
+    // Ensure the angle is within [0, 360) degrees
+    if (newAngle < 0.0f)
+    {
+        newAngle += 360.0f;
+    }
+    else if (newAngle >= 360.0f)
+    {
+        newAngle -= 360.0f;
+    }
+
+    return newAngle;
+}
+
 Position getRectCenter(Rectangle rect)
 {
     Position center;

@@ -5,6 +5,7 @@
 #include "components.h"
 
 float getAngleBetweenPoints(Position p1, Position p2);
+float getRandomAngleWithinRange(float originalAngle, float range);
 Position getRectCenter(Rectangle rect);
 Position rotatePoint(Position origin, Position point, float angle);
 void rotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);

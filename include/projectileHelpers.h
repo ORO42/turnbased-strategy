@@ -7,13 +7,12 @@
 #include "generalUtils.h"
 #include "raymath.h"
 #include <cmath>
-#include <unordered_set>
+#include <unordered_map>
 
 SharedPointer<Projectile> createProjectile(
     VectorSharedPointer<Projectile> &allProjectiles,
     Texture2D tex,
     Position originPos,
-    // Position &destinationPos,
     Rectangle targetRect,
     std::string originUnitUuid,
     Teams team,
@@ -21,9 +20,9 @@ SharedPointer<Projectile> createProjectile(
     float speed,
     bool canCollideBeforeDestination,
     bool causesExplosion,
-    int projectileaccuracyRadius,
+    int projectileAccuracyRadius,
+    int projectileDamageRadius,
     float damage,
     float accuracy);
-;
+
 void sMoveProjectiles(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, float deltaTime);
-void sProjectileDamage(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles);

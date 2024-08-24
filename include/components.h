@@ -204,7 +204,6 @@ struct Projectile
 {
     Texture2D tex;
     Position originPos; // TODO maybe these need to be rects
-    // Position destinationPos = {-1.0, -1.0}; // TODO maybe these need to be rects
     Rectangle targetRect;
     Position currentPos;
     float facingAngle;
@@ -220,6 +219,5 @@ struct Projectile
     float accuracy; // the chance this projectile causes damage to each unit/obstacle
     std::vector<std::string> idsToIgnoreInFlight;
     // Position endPos;                             // the point at which the projectile needs to be destroyed (used to get overlapping obstacles, units, tiles)
-    Rectangle endRect = {-1.0f, -1.0f};
     // bool doesStopAtEndRect = true; // for use with precomputed projectiles. If false, the obstacle moves past the end rect (assigned at runtime)
 };

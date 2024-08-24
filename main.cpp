@@ -143,8 +143,7 @@ int main(void)
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player, allObstacles);
         sMoveUnits(allUnits, deltaTime);
-        // sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
-        // sProjectileDamage(allProjectiles, allUnits, allObstacles);
+        sMoveProjectiles(allProjectiles, allUnits, allObstacles, deltaTime);
         // DEBUGsHoveredTileOverlappingTrap(hoveredTile, allUnits);
 
         sDestroyUnits(allUnits, selectedUnit, selectedAbility);
@@ -173,6 +172,15 @@ int main(void)
         sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
         sDrawHealthValues(allUnits, allObstacles);
+
+        if (selectedUnit)
+        {
+            std::vector<Line> lines = createLinesWithinRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, 20), 5);
+            for (auto &line : lines)
+            {
+                DrawLine(line.startX, line.startY, line.endX, line.endY, PINK);
+            }
+        }
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode
