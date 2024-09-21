@@ -50,11 +50,13 @@ void sSelectUnit(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
     }
 }
 
-void sClearStates(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility)
+void sClearStates(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, UnitType &unitToPlaceType, Texture2D &unitToPlaceTex)
 {
     if (IsKeyPressed(KEY_C))
     {
         selectedUnit = nullptr;
         selectedAbility = nullptr;
+        unitToPlaceType = UnitType::NA;
+        unitToPlaceTex = {};
     }
 }

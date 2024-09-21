@@ -67,6 +67,10 @@ int main(void)
     // std::unordered_map<UnitType, float> unitCreationCostPlayerAp = {{UnitType::ATSOLIDER, 10.0f}, {UnitType::ENGINEER, 15.0f}};
 
     // UI Modes
+    SharedPointer<Rectangle> targetRect = nullptr;
+
+    UnitType unitToPlaceType = UnitType::NA;
+    Texture2D unitToPlaceTex;
 
     // define signals
     // Signal<PrepareTrapezoidRotationPayload> prepareTrapezoidRotationSignal;
@@ -138,8 +142,8 @@ int main(void)
         sSelectUnit(selectedUnit, selectedAbility, allUnits, worldMousePos, player);
         sAutoDeselectAbility(selectedUnit, selectedAbility);
         sSelectAbility(selectedUnit, selectedAbility, worldMousePos);
-        sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, projectileTex);
-        sClearStates(selectedUnit, selectedAbility);
+        sUseAbility(selectedUnit, selectedAbility, hoveredTile, hoveredUnit, hoveredObstacle, unitToPlaceType, unitToPlaceTex, player, allUnits, allObstacles, worldMousePos, allGridSubdivisions, allProjectiles, projectileTex, unitTex);
+        sClearStates(selectedUnit, selectedAbility, unitToPlaceType, unitToPlaceTex);
         sPositionVisionTrapezoids(allUnits);
         sVisibility(allUnits, player, allObstacles);
         sMoveUnits(allUnits, deltaTime);
@@ -172,15 +176,16 @@ int main(void)
         sDrawDistanceIndicators(selectedAbility, selectedUnit, hoveredTile, allObstacles, allUnits, worldMousePos);
         sDrawReachRadiusRect(selectedAbility, selectedUnit);
         sDrawHealthValues(allUnits, allObstacles);
+        sDrawUnitToPlace(selectedAbility, unitToPlaceType, unitToPlaceTex, worldMousePos);
 
-        if (selectedUnit)
-        {
-            std::vector<Line> lines = createLinesWithinRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, 20), 5);
-            for (auto &line : lines)
-            {
-                DrawLine(line.startX, line.startY, line.endX, line.endY, PINK);
-            }
-        }
+        // if (selectedUnit)
+        // {
+        //     std::vector<Line> lines = createLinesWithinRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, createRectAroundRect({selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, 20), 5);
+        //     for (auto &line : lines)
+        //     {
+        //         DrawLine(line.startX, line.startY, line.endX, line.endY, PINK);
+        //     }
+        // }
 
         EndMode2D();
         // elements that follow camera are drawn outside of 2D mode

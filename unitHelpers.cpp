@@ -101,7 +101,7 @@ void createUnit(
     if (unitType == UnitType::RIFLEMAN)
     {
         newUnit->attack = 25.0f;
-        newUnit->accuracy = 50.0f;
+        newUnit->accuracy = 100.0f;
         newUnit->maxAp = 100.0f;
         newUnit->ap = newUnit->maxAp;
         newUnit->abilities = VectorSharedPointer<Ability>{moveAbility, rotateAbility, rifleAbility, placeRiflemanAbility};
@@ -171,7 +171,6 @@ void sVisibility(VectorSharedPointer<Unit> &allUnits, SharedPointer<Player> &pla
                                 }
                             }
                         }
-                        std::cout << blockedCt << std::endl;
                         if (blockedCt < 16) // 16 lines are created from getCornerToCornerLines()
                         {
                             unit2->isVisibleToOppositeTeam = true;

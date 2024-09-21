@@ -460,3 +460,18 @@ std::vector<Line> createLinesWithinRect(const Rectangle &originRect, const Recta
 
     return lines;
 }
+
+// deduce the grid-cell-rect a point is overlapping within a grid of homogeneously shaped rectangular cells
+Rectangle deduceRectForPos(Position pos, float gridCellWidth = 32.0f, float gridCellHeight = 32.0f)
+{
+    // Calculate the row and column based on the x, y position
+    int column = static_cast<int>(pos.x / gridCellWidth);
+    int row = static_cast<int>(pos.y / gridCellHeight);
+
+    // Calculate the top-left corner of the rectangle
+    float rectX = column * gridCellWidth;
+    float rectY = row * gridCellHeight;
+
+    // Return the rectangle
+    return {rectX, rectY, gridCellWidth, gridCellHeight};
+}

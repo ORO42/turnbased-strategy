@@ -23,3 +23,4 @@ void sDrawFacingAngleIndicator(VectorSharedPointer<Unit> &allUnits, SharedPointe
 void sDrawDistanceIndicators(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit, SharedPointer<Tile> &hoveredTile, VectorSharedPointer<Obstacle> &allObstacles, VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos);
 void sDrawReachRadiusRect(SharedPointer<Ability> &selectedAbility, SharedPointer<Unit> &selectedUnit);
 void sDrawHealthValues(VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles);
+void sDrawUnitToPlace(SharedPointer<Ability> &selectedAbility, UnitType &unitToPlaceType, Texture2D &unitToPlaceTex, Vector2 &worldMousePos);

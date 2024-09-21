@@ -272,3 +272,11 @@ void sDrawHealthValues(VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<
         DrawText(TextFormat("%.0f", obstacle->health), obstacleCenter.x, obstacleCenter.y - 12, 12, YELLOW);
     }
 }
+
+void sDrawUnitToPlace(SharedPointer<Ability> &selectedAbility, UnitType &unitToPlaceType, Texture2D &unitToPlaceTex, Vector2 &worldMousePos)
+{
+    if (selectedAbility && selectedAbility->abilityType == AbilityTypes::PLACE_RIFLEMAN)
+    {
+        DrawTexture(unitToPlaceTex, worldMousePos.x, worldMousePos.y, WHITE);
+    }
+}

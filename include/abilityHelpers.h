@@ -13,5 +13,5 @@
 #include <random>
 
 void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, Vector2 &worldMousePos);
-void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex);
+void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, UnitType &unitToPlaceType, Texture2D &unitToPlaceTex, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex, Texture2D riflemanTex);
 void sAutoDeselectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility);

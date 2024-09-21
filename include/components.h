@@ -203,7 +203,7 @@ struct GridSubdivision
 struct Projectile
 {
     Texture2D tex;
-    Position originPos; // TODO maybe these need to be rects
+    Rectangle originUnitRect;
     Rectangle targetRect;
     Position currentPos;
     float facingAngle;
@@ -220,4 +220,5 @@ struct Projectile
     std::vector<std::string> idsToIgnoreInFlight;
     // Position endPos;                             // the point at which the projectile needs to be destroyed (used to get overlapping obstacles, units, tiles)
     // bool doesStopAtEndRect = true; // for use with precomputed projectiles. If false, the obstacle moves past the end rect (assigned at runtime)
+    int reachRadius;
 };

@@ -12,9 +12,10 @@
 SharedPointer<Projectile> createProjectile(
     VectorSharedPointer<Projectile> &allProjectiles,
     Texture2D tex,
-    Position originPos,
+    Rectangle originUnitRect,
     Rectangle targetRect,
     std::string originUnitUuid,
+    Position currentPos,
     Teams team,
     float facingAngle,
     float speed,
@@ -23,6 +24,7 @@ SharedPointer<Projectile> createProjectile(
     int projectileAccuracyRadius,
     int projectileDamageRadius,
     float damage,
-    float accuracy);
+    float accuracy,
+    int reachRadius);
 
 void sMoveProjectiles(VectorSharedPointer<Projectile> &allProjectiles, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, float deltaTime);

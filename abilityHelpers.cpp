@@ -62,7 +62,7 @@ void sSelectAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &s
     }
 }
 
-void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex)
+void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &selectedAbility, SharedPointer<Tile> &hoveredTile, SharedPointer<Unit> &hoveredUnit, SharedPointer<Obstacle> &hoveredObstacle, UnitType &unitToPlaceType, Texture2D &unitToPlaceTex, SharedPointer<Player> &player, VectorSharedPointer<Unit> &allUnits, VectorSharedPointer<Obstacle> &allObstacles, Vector2 &worldMousePos, VectorSharedPointer<GridSubdivision> &allGridSubdivisions, VectorSharedPointer<Projectile> &allProjectiles, Texture2D projectileTex, Texture2D riflemanTex)
 {
     VectorSharedPointer<Unit> unitsToAffect = {};
     VectorSharedPointer<Obstacle> obstaclesToAffect = {};
@@ -125,7 +125,7 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
                     angleToTarget = getRandomAngleWithinRange(angleToTarget, 25.0f);
                 }
 
-                createProjectile(allProjectiles, projectileTex, selectedUnitCenter, targetRect, selectedUnit->uuid, selectedUnit->team, angleToTarget, 100.0f, false, false, selectedAbility->accuracyRadius, 0, 25.0f, selectedUnit->accuracy);
+                createProjectile(allProjectiles, projectileTex, {selectedUnit->pos.x, selectedUnit->pos.y, static_cast<float>(selectedUnit->tex.width), static_cast<float>(selectedUnit->tex.height)}, targetRect, selectedUnit->uuid, selectedUnitCenter, selectedUnit->team, angleToTarget, 100.0f, true, false, selectedAbility->accuracyRadius, 1, 25.0f, selectedUnit->accuracy, selectedAbility->reachRadius);
 
                 useAbility = true;
             }
@@ -139,6 +139,11 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
             break;
 
         case AbilityTypes::PLACE_RIFLEMAN:
+            unitToPlaceType = UnitType::RIFLEMAN;
+            unitToPlaceTex = riflemanTex;
+            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+            {
+            }
             break;
         }
     }
