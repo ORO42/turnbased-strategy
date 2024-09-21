@@ -270,3 +270,102 @@ void sUnitHover(VectorSharedPointer<Unit> &allUnits, SharedPointer<Unit> &hovere
         // }
     }
 }
+
+void sUnitOperations(
+    VectorSharedPointer<Unit> &allUnits,
+    SharedPointer<Player> &player,
+    VectorSharedPointer<Obstacle> &allObstacles,
+    SharedPointer<Tile> &hoveredTile,
+    Vector2 &worldMousePos,
+    SharedPointer<Unit> &hoveredUnit,
+    float deltaTime)
+{
+    for (auto &unit : allUnits)
+    {
+        // sPositionVisionTrapezoids
+        IsoscelesTrapezoid trapezoid;
+        trapezoid.originPos = getRectCenter({unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)});
+        trapezoid.p1 = {trapezoid.originPos.x + ((unit->viewWidth / 2) * 32.0f), trapezoid.originPos.y};
+        trapezoid.p4 = {trapezoid.originPos.x - ((unit->viewWidth / 2) * 32.0f), trapezoid.originPos.y};
+        trapezoid.p2 = {trapezoid.p1.x + (unit->viewDistance * 32.0f), trapezoid.p1.y - (unit->viewDistance * 32.0f)};
+        trapezoid.p3 = {trapezoid.p4.x - (unit->viewDistance * 32.0f), trapezoid.p2.y};
+
+        float northAngle = -90.0f;
+        float angleDelta = angleDifference(northAngle, unit->facingAngle);
+        rotateTrapezoid(trapezoid, angleDelta);
+        unit->visionTrapezoid = trapezoid;
+
+        // sVisibility
+        unit->isVisibleToOppositeTeam = false;
+        for (auto &unit2 : allUnits)
+        {
+            if (unit2->uuid != unit->uuid && unit->team != unit2->team)
+            {
+                if (checkTrapRectOverlap(unit->visionTrapezoid, {unit2->pos.x, unit2->pos.y, static_cast<float>(unit2->tex.width), static_cast<float>(unit2->tex.height)}))
+                {
+                    std::vector<Line> cornerLines = getCornerToCornerLines(
+                        {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)},
+                        {unit2->pos.x, unit2->pos.y, static_cast<float>(unit2->tex.width), static_cast<float>(unit2->tex.height)});
+                    int blockedCt = 0;
+
+                    for (auto &line : cornerLines)
+                    {
+                        for (auto &obstacle : allObstacles)
+                        {
+                            if (lineRectOverlap({obstacle->pos.x, obstacle->pos.y, static_cast<float>(obstacle->tex.width), static_cast<float>(obstacle->tex.height)}, line))
+                            {
+                                blockedCt++;
+                                break;
+                            }
+                        }
+                    }
+                    if (blockedCt < 16)
+                    {
+                        unit2->isVisibleToOppositeTeam = true;
+                    }
+                }
+            }
+        }
+
+        // DEBUGsHoveredTileOverlappingTrap
+        if (checkTrapRectOverlap(unit->visionTrapezoid, {hoveredTile->pos.x, hoveredTile->pos.y, 32.0f, 32.0f}))
+        {
+            std::cout << "OVERLAP" << std::endl;
+        }
+        else
+        {
+            std::cout << "NO OVERLAP" << std::endl;
+        }
+
+        // sMoveUnits
+        if (unit->movePoint.x != -1.0f || unit->movePoint.y != -1.0)
+        {
+            Vector2 direction = {unit->movePoint.x - unit->pos.x, unit->movePoint.y - unit->pos.y};
+            float distance = Vector2Distance({unit->pos.x, unit->pos.y}, {unit->movePoint.x, unit->movePoint.y});
+
+            if (distance > 0.0f)
+            {
+                direction.x /= distance;
+                direction.y /= distance;
+
+                float moveStep = (32.0f * 20) * deltaTime;
+                if (moveStep >= distance)
+                {
+                    unit->pos = unit->movePoint;
+                    unit->movePoint = {-1.0f, -1.0f};
+                }
+                else
+                {
+                    unit->pos.x += direction.x * moveStep;
+                    unit->pos.y += direction.y * moveStep;
+                }
+            }
+        }
+
+        // sUnitHover
+        if (CheckCollisionPointRec(worldMousePos, {unit->pos.x, unit->pos.y, static_cast<float>(unit->tex.width), static_cast<float>(unit->tex.height)}))
+        {
+            hoveredUnit = unit;
+        }
+    }
+}

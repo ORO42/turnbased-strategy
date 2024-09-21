@@ -21,3 +21,11 @@ bool shouldRenderUnitDueToVisibility(SharedPointer<Unit> &unit, SharedPointer<Pl
 void sMoveUnits(VectorSharedPointer<Unit> &allUnits, float deltaTime);
 bool isMouseOverAnyUnit(VectorSharedPointer<Unit> &allUnits, Vector2 &worldMousePos);
 void sUnitHover(VectorSharedPointer<Unit> &allUnits, SharedPointer<Unit> &hoveredUnit, Vector2 &worldMousePos);
+void sUnitOperations(
+    VectorSharedPointer<Unit> &allUnits,
+    SharedPointer<Player> &player,
+    VectorSharedPointer<Obstacle> &allObstacles,
+    SharedPointer<Tile> &hoveredTile,
+    Vector2 &worldMousePos,
+    SharedPointer<Unit> &hoveredUnit,
+    float deltaTime);
