@@ -85,22 +85,10 @@ int main(void)
     SetTargetFPS(60); // Set our game to run at 60 frames-per-second
 
     // Load textures, must be done after InitWindow()
-    Texture2D crateTex = LoadTexture("assets/crate_png.png");
-    Texture2D grassTex = LoadTexture("assets/Grass_seamless.png");
-    Texture2D fobTex = LoadTexture("assets/fob.png");
-    Texture2D stoneTileTex = LoadTexture("assets/stone_tile.png");
-    Texture2D unitTex = LoadTexture("assets/unit.png");
-    Texture2D HQTex = LoadTexture("assets/mil_tent.png");
-    Texture2D goldmineTex = LoadTexture("assets/goldmine.png");
-    Texture2D oildrillTex = LoadTexture("assets/oildrill.png");
-    Texture2D proxsensorTex = LoadTexture("assets/proximitysensor.png");
-    Texture2D sandbagTex = LoadTexture("assets/sandbag.png");
-    Texture2D silvermineTex = LoadTexture("assets/silvermine.png");
-    Texture2D trenchTex = LoadTexture("assets/trench.png");
-    Texture2D tunnelTex = LoadTexture("assets/tunnel.png");
-    Texture2D wallTex = LoadTexture("assets/wall.png");
-    Texture2D chevronTex = LoadTexture("assets/chevron.png");
-    Texture2D projectileTex = LoadTexture("assets/projectile.png");
+    Texture2D grassTex = LoadTexture("assets/tiles/tile000.png");
+    Texture2D unitTex = LoadTexture("assets/units/soldier_standing.png");
+    Texture2D wallTex = LoadTexture("assets/obstacles/wallTex.png");
+    Texture2D projectileTex = LoadTexture("assets/projectiles/projectile.png");
 
     setupRectangularGrid(192, 192, allTiles, grassTex);
     createGridSubdivisions(allGridSubdivisions, allTiles, 192 * 32, 192 * 32, 8, 8);
@@ -169,7 +157,7 @@ int main(void)
         sDrawSelectedUnitIndicator(selectedUnit);
         sDrawHoveredTileIndicator(hoveredTile, selectedAbility);
         sDrawaccuracyRadius(selectedUnit, selectedAbility, hoveredTile);
-        sDrawRotationChevron(allUnits, camera, chevronTex, player);
+        // sDrawRotationChevron(allUnits, camera, chevronTex, player);
         sDrawVisionTrapezoids(allUnits, camera, player);
         // DEBUGsDrawAngleToHoveredTile(selectedUnit, hoveredTile);
         sDrawFacingAngleIndicator(allUnits, player);
@@ -201,21 +189,9 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadTexture(crateTex);
     UnloadTexture(grassTex);
-    UnloadTexture(fobTex);
-    UnloadTexture(stoneTileTex);
     UnloadTexture(unitTex);
-    UnloadTexture(HQTex);
-    UnloadTexture(goldmineTex);
-    UnloadTexture(oildrillTex);
-    UnloadTexture(proxsensorTex);
-    UnloadTexture(sandbagTex);
-    UnloadTexture(silvermineTex);
-    UnloadTexture(trenchTex);
-    UnloadTexture(tunnelTex);
     UnloadTexture(wallTex);
-    UnloadTexture(chevronTex);
     UnloadTexture(projectileTex);
     // TODO once sound is added, unload sound
     // UnloadSound(fxWav); // Unload sound data
