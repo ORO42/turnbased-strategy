@@ -143,6 +143,7 @@ void sUseAbility(SharedPointer<Unit> &selectedUnit, SharedPointer<Ability> &sele
             unitToPlaceTex = riflemanTex;
             if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
             {
+                createUnit(UnitType::RIFLEMAN, {hoveredTile->pos.x, hoveredTile->pos.y}, player, Teams::BLUETEAM, allUnits, unitToPlaceTex);
             }
             break;
         }
